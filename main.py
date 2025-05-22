@@ -1,12 +1,27 @@
 import pygame as pg
-pg.init()
 from level import Level
+from constants import *
+pg.init()
 
 class Main:
     def __init__(self):
-        self.level = Level()
-        self.run = True
+        self.running = True
         self.clock = pg.time.Clock()
-        self.dt = 0
-        self.fps = 60
-        self.screen = pg.display.set_mode((1280, 720))
+        self.screen = pg.display.set_mode(WINSIZE)
+        self.surface = pg.Surface(WINQUARTER)
+        self.level = Level()
+    
+    def run_game(self):
+        while self.running:
+            self.clock.tick(FPS)
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    self.running = False
+            self.level.update(self)
+            surface = pg.transform.scale(self.surface, WINSIZE)
+            self.screen.blit(surface, (0, 0))
+            pg.display.flip()
+        pg.quit()
+
+if __name__ == '__main__':
+    Main().run_game()
