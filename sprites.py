@@ -1,12 +1,35 @@
 import pygame as pg
+from constants import *
 
 class Wall(pg.sprite.Sprite):
     def __init__(self, groups, x, y, width, height):
         super().__init__(groups)
         self.image = pg.Surface((width, height))
-        self.image.fill((0, 0, 0))
-        self.rect = self.image.get_rect(topleft=(x, y))
+        self.image.fill(WHITE)
+        self.rect = self.image.get_rect()
+        # draw a black border with a (100,100,100) fill
+        pg.draw.rect(self.image, (100,100,100), self.rect, 0, 5)
+        pg.draw.rect(self.image, BLACK, self.rect, 2, 5)
+        self.rect.topleft = (x, y)
     
     def update(self, level):
         self.rect.x += level.movex
         self.rect.y += level.movey
+
+class Bullet(pg.sprite.Sprite):
+    def __init__(self, groups, x, y, direction):
+        super().__init__(groups)
+        self.image = pg.Surface((5, 5))
+        self.image.fill(YELLOW)
+        self.rect = self.image.get_rect(center=(x, y))
+        self.direction = direction
+        self.timer = PressTimer(500)
+        self.timer.start_timer()
+
+    def update(self, level):
+        self.rect.x += self.direction[0] * BULLETSPEED
+        self.rect.y += self.direction[1] * BULLETSPEED
+        self.rect.x += level.movex
+        self.rect.y += level.movey
+        if self.timer.update():
+            self.kill()

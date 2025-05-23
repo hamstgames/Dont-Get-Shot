@@ -11,6 +11,8 @@ FPS = 60
 PLAYERSIZE = (50, 50)
 PLAYERPOS = (WINQW // 2, WINQH // 2)
 
+BULLETSPEED = 5
+
 IMAGES = {}
 BASEPATH = Path(__file__).parent
 ASSETSPATH = BASEPATH / "assets"
