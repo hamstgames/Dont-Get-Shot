@@ -31,5 +31,4 @@ class Bullet(pg.sprite.Sprite):
         self.rect.x += level.movex
         self.rect.y += level.movey
         if self.timer.update(): self.kill()
-        touch = list(level.touchable)
-        if self.rect.collidelist(touch) != -1: self.kill()
+        if not level.touched(self.rect): self.kill()

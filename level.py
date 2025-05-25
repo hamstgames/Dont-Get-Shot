@@ -19,27 +19,31 @@ class Level:
         self.flip = False
         self.shoot_timer = PressTimer(100)
 
+    def touched(self, rect=None):
+        rect = self.player_rect if rect is None else rect
+        collist = list(self.touchable)
+        collisions = rect.collidelist(collist)
+        return collisions == -1
+
     def update(self, main):
         main.surface.fill(WHITE)
         keys = pg.key.get_pressed()
-        touch = [t.rect for t in self.touchable]
-        getcol = lambda x: self.player_rect.collidelist(x)
         self.movex, self.movey = 0, 0
         if keys[pg.K_a]:
             self.player_rect.x -= 1
-            if getcol(touch) == -1: self.movex = 1
+            if self.touched(): self.movex = 1
             self.player_rect.x += 1
         if keys[pg.K_d]:
             self.player_rect.x += 1
-            if getcol(touch) == -1: self.movex = -1
+            if self.touched(): self.movex = -1
             self.player_rect.x -= 1
         if keys[pg.K_w]:
             self.player_rect.y -= 1
-            if getcol(touch) == -1: self.movey = 1
+            if self.touched(): self.movey = 1
             self.player_rect.y += 1
         if keys[pg.K_s]:
             self.player_rect.y += 1
-            if getcol(touch) == -1: self.movey = -1
+            if self.touched(): self.movey = -1
             self.player_rect.y -= 1
         self.walls.update(self)
         self.bullets.update(self)
