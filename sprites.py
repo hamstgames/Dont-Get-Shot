@@ -7,7 +7,6 @@ class Wall(pg.sprite.Sprite):
         self.image = pg.Surface((width, height))
         self.image.fill(WHITE)
         self.rect = self.image.get_rect()
-        # draw a black border with a (100,100,100) fill
         pg.draw.rect(self.image, (100,100,100), self.rect, 0, 5)
         pg.draw.rect(self.image, BLACK, self.rect, 2, 5)
         self.rect.topleft = (x, y)
@@ -19,8 +18,8 @@ class Wall(pg.sprite.Sprite):
 class Bullet(pg.sprite.Sprite):
     def __init__(self, groups, x, y, direction):
         super().__init__(groups)
-        self.image = pg.Surface((5, 5))
-        self.image.fill(YELLOW)
+        self.image = pg.Surface((3, 3))
+        self.image.fill(DARKYELLOW)
         self.rect = self.image.get_rect(center=(x, y))
         self.direction = direction
         self.timer = PressTimer(500)
@@ -31,5 +30,6 @@ class Bullet(pg.sprite.Sprite):
         self.rect.y += self.direction[1] * BULLETSPEED
         self.rect.x += level.movex
         self.rect.y += level.movey
-        if self.timer.update():
-            self.kill()
+        if self.timer.update(): self.kill()
+        touch = list(level.touchable)
+        if self.rect.collidelist(touch) != -1: self.kill()
