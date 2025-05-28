@@ -13,7 +13,7 @@ class Level:
         self.particles = pg.sprite.Group()
         self.walls = pg.sprite.Group()
         self.touchable = pg.sprite.Group()
-        walls = [[0, 0, 20, 20], [50, 50, 20, 20], [100, 100, 20, 20]]
+        walls = [[0, 0, 50, 50], [50, 50, 50, 50], [100, 100, 50, 50]]
         for wall in walls:
             Wall([self.all_sprites, self.walls, self.touchable], *wall)
         self.flip = False
@@ -53,7 +53,7 @@ class Level:
             main.surface.blit(self.player_flip, self.player_rect)
         else: main.surface.blit(self.player_image, self.player_rect)
         mouse_pos = [float(a) for a in pg.mouse.get_pos()]
-        mouse_pos[0] /= 4; mouse_pos[1] /= 4
+        mouse_pos[0] /= WINTIMES; mouse_pos[1] /= WINTIMES
         angle = math.degrees(math.atan2(mouse_pos[1] - self.player_rect.centery, 
                                         mouse_pos[0] - self.player_rect.centerx))
         left = angle < -90 or angle > 90
@@ -67,5 +67,5 @@ class Level:
         rect.x += round(direction.x * 20); rect.y += round(direction.y * 20)
         main.surface.blit(gun, rect)
         if pg.mouse.get_pressed()[0] and self.shoot_timer.update():
-            Bullet([self.all_sprites, self.bullets], *rect.center, direction)
+            Bullet([self.all_sprites, self.bullets], *rect.center, direction, angle)
             self.shoot_timer.start_timer()

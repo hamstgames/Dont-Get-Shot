@@ -8,7 +8,7 @@ class Main:
         self.running = True
         self.clock = pg.time.Clock()
         self.screen = pg.display.set_mode(WINSIZE)
-        self.surface = pg.Surface(WINQUARTER)
+        self.surface = pg.Surface(WINSURFACE)
         self.level = Level()
     
     def run_game(self):

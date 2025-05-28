@@ -1,19 +1,20 @@
-from pygame_utils import *
+from pygame_utils import * #type:ignore[wildcard-import]
 from pathlib import Path
 
 WINW = 800; WINH = 600
 WINSIZE = (WINW, WINH)
-WINQW = WINW // 4; WINQH = WINH // 4
-WINQUARTER = (WINQW, WINQH)
+WINSW = WINW // 2; WINSH = WINH // 2
+WINSURFACE = (WINSW, WINSH)
+WINTIMES = WINW / WINSW
 
 FPS = 60
 
 PLAYERSIZE = (50, 50)
-PLAYERPOS = (WINQW // 2, WINQH // 2)
+PLAYERPOS = (WINSW // 2, WINSH // 2)
 
 BULLETSPEED = 5
 
-IMAGES = {}
+IMAGES: dict[str, pg.Surface] = {}
 BASEPATH = Path(__file__).parent
 ASSETSPATH = BASEPATH / "assets"
 IMAGESPATH = ASSETSPATH / "images"
