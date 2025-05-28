@@ -19,16 +19,16 @@ class Bullet(pg.sprite.Sprite):
     def __init__(self, groups, x, y, direction, angle):
         super().__init__(groups)
         self.image = IMAGES["bullet"]
-        self.image = pg.transform.rotate(self.image, angle)
+        self.image = pg.transform.rotate(self.image, -angle)
         self.rect = self.image.get_rect(center=(x, y))
         self.direction = direction
-        self.timer = PressTimer(500)
+        self.timer = PressTimer(1000)
         self.timer.start_timer()
 
     def update(self, level):
-        # self.rect.x += self.direction[0] * BULLETSPEED
-        # self.rect.y += self.direction[1] * BULLETSPEED
-        # self.rect.x += level.movex
-        # self.rect.y += level.movey
-        # if self.timer.update(): self.kill()
+        self.rect.x += self.direction[0] * BULLETSPEED
+        self.rect.y += self.direction[1] * BULLETSPEED
+        self.rect.x += level.movex
+        self.rect.y += level.movey
+        if self.timer.update(): self.kill()
         if not level.touched(self.rect): self.kill()
