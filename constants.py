@@ -16,6 +16,7 @@ FPS = 60
 
 PLAYERSIZE = (50, 50)
 PLAYERPOS = (WINSW // 2, WINSH // 2)
+PLAYERSPEED = 2
 
 IMAGES: dict[str, pg.Surface] = {}
 BASEPATH = Path(__file__).parent
@@ -31,25 +32,25 @@ GUNTYPE:Literal['revolver', 'handgun', 'rifle', 'shotgun'] = "revolver"
 GUNDATA = {
     "revolver": {
         "cooldown": 0.2,
-        "bulletspeed": 10,
+        "bulletspeed": 15,
         "deviation": 6,
         "image": scale1_2(IMAGES["revolver"]),
         "quantity": 1
     }, "handgun": {
         "cooldown": 0.2,
-        "bulletspeed": 10,
+        "bulletspeed": 15,
         "deviation": 0,
         "image": scale1_2(IMAGES["handgun"]),
         "quantity": 1
     }, "rifle": {
         "cooldown": 0.1,
-        "bulletspeed": 15,
+        "bulletspeed": 20,
         "deviation": 5,
         "image": scale1_2(IMAGES["rifle"]),
         "quantity": 1
     }, "shotgun": {
         "cooldown": 0.6,
-        "bulletspeed": 10,
+        "bulletspeed": 15,
         "deviation": 10,
         "image": scale1_2(IMAGES["shotgun"]),
         "quantity": 6

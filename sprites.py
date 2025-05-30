@@ -15,6 +15,20 @@ class Wall(pg.sprite.Sprite):
         self.rect.x += level.movex
         self.rect.y += level.movey
 
+class Explosion(pg.sprite.Sprite):
+    def __init__(self, groups, x, y, surface, time):
+        super().__init__(groups)
+        self.image = pg.transform.rotate(surface, randint(0, 360))
+        self.rect = self.image.get_rect(center=(x, y))
+        self.start = pg.time.get_ticks()
+        self.time = time
+
+    def update(self, level):
+        self.rect.x += level.movex
+        self.rect.y += level.movey
+        if pg.time.get_ticks() - self.start > self.time:
+            self.kill()
+
 class Bullet(pg.sprite.Sprite):
     def __init__(self, groups, x, y, direction, angle, speed):
         super().__init__(groups)
@@ -32,4 +46,6 @@ class Bullet(pg.sprite.Sprite):
         self.rect.x += level.movex
         self.rect.y += level.movey
         if self.timer.update(): self.kill()
-        if not level.touched(self.rect): self.kill()
+        if not level.touched(self.rect):
+            Explosion(self.groups(), *self.rect.center, IMAGES["bullet_explode"], 100)
+            self.kill()

@@ -34,21 +34,21 @@ class Level:
         keys = pg.key.get_pressed()
         self.movex, self.movey = 0, 0
         if keys[pg.K_a]:
-            self.player_rect.x -= 1
-            if self.touched(): self.movex = 1; self.flip = False
-            self.player_rect.x += 1
+            self.player_rect.x -= PLAYERSPEED
+            if self.touched(): self.movex = PLAYERSPEED; self.flip = False
+            self.player_rect.x += PLAYERSPEED
         if keys[pg.K_d]:
-            self.player_rect.x += 1
-            if self.touched(): self.movex = -1; self.flip = True
-            self.player_rect.x -= 1
+            self.player_rect.x += PLAYERSPEED
+            if self.touched(): self.movex = -PLAYERSPEED; self.flip = True
+            self.player_rect.x -= PLAYERSPEED
         if keys[pg.K_w]:
-            self.player_rect.y -= 1
-            if self.touched(): self.movey = 1
-            self.player_rect.y += 1
+            self.player_rect.y -= PLAYERSPEED
+            if self.touched(): self.movey = PLAYERSPEED
+            self.player_rect.y += PLAYERSPEED
         if keys[pg.K_s]:
-            self.player_rect.y += 1
-            if self.touched(): self.movey = -1
-            self.player_rect.y -= 1
+            self.player_rect.y += PLAYERSPEED
+            if self.touched(): self.movey = -PLAYERSPEED
+            self.player_rect.y -= PLAYERSPEED
         if self.change_timer.update():
             if keys[pg.K_q]:
                 self.inventory_index -= 1
