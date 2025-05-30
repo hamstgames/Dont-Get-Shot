@@ -18,6 +18,10 @@ class Level:
             Wall([self.all_sprites, self.walls, self.touchable], *wall)
         self.flip = False
         self.shoot_timer = PressTimer(100)
+        self.change_timer = PressTimer(100)
+        self.change_timer.start_timer()
+        self.inventory = ['rifle','shotgun','handgun','revolver']
+        self.inventory_index = 0
 
     def touched(self, rect=None):
         rect = self.player_rect if rect is None else rect
@@ -45,6 +49,18 @@ class Level:
             self.player_rect.y += 1
             if self.touched(): self.movey = -1
             self.player_rect.y -= 1
+        if self.change_timer.update():
+            if keys[pg.K_q]:
+                self.inventory_index -= 1
+                if self.inventory_index < 0:
+                    self.inventory_index = len(self.inventory) - 1
+                self.change_timer.start_timer()
+            if keys[pg.K_e]:
+                self.inventory_index += 1
+                self.inventory_index %= len(self.inventory)
+                self.change_timer.start_timer()
+        gundata = GUNDATA[self.inventory[self.inventory_index]]
+        self.shoot_timer.duration = gundata['cooldown'] * 1000
         self.walls.update(self)
         self.bullets.update(self)
         self.particles.update(self)
@@ -57,8 +73,8 @@ class Level:
         angle = math.degrees(math.atan2(mouse_pos[1] - self.player_rect.centery, 
                                         mouse_pos[0] - self.player_rect.centerx))
         left = angle < -90 or angle > 90
-        if left: gun = pg.transform.flip(IMAGES['AK-47'], False, True)
-        else: gun = IMAGES['AK-47']
+        gun = gundata['image']
+        if left: gun = pg.transform.flip(gun, False, True)
         gun = pg.transform.rotate(gun, -angle)
         playerx, playery = self.player_rect.center
         rect = gun.get_rect(center=(playerx, playery))
@@ -67,5 +83,10 @@ class Level:
         rect.x += round(direction.x * 20); rect.y += round(direction.y * 20)
         main.surface.blit(gun, rect)
         if pg.mouse.get_pressed()[0] and self.shoot_timer.update():
-            Bullet([self.all_sprites, self.bullets], *rect.center, direction, angle)
+            for _ in range(gundata['quantity']):
+                angle += randint(-gundata['deviation'], gundata['deviation'])
+                direction = pg.Vector2(
+                    math.cos(math.radians(angle)), math.sin(math.radians(angle)))
+                Bullet([self.all_sprites, self.bullets], *rect.center, 
+                    direction, angle, gundata['bulletspeed'])
             self.shoot_timer.start_timer()
