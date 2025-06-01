@@ -49,3 +49,51 @@ class Bullet(pg.sprite.Sprite):
         if not level.touched(self.rect):
             Explosion(self.groups(), *self.rect.center, IMAGES["bullet_explode"], 100)
             self.kill()
+
+class Enemy(pg.sprite.Sprite):
+    """A Enemy class to subclass"""
+    def __init__(self, groups, x, y, image, speed=0):
+        super().__init__(groups)
+        self.image = image
+        self.rect = self.image.get_rect(center=(x, y))
+        self.speed = speed
+        self.state = 'idle'
+        self.direction = 0 # direction in degrees
+
+    def update(self, level):
+        self.rect.x += level.movex
+        self.rect.y += level.movey
+        if self.state == 'idle':
+            if random() < 0.01:
+                self.direction = randint(0, 360)
+            # do line check if seen player
+            player_center = level.player_rect.center
+            vector = pg.Vector2(player_center) - pg.Vector2(self.rect.center)
+            linex, liney = vector.normalize()
+            x = self.rect.centerx; y = self.rect.centery
+            for i in range(100):
+                x += linex; y += liney
+                if not level.touched(pg.Rect(x, y, 1, 1)):
+                    break
+            else:
+                if vector.magnitude() < 100:
+                    self.state = 'chase'
+        if self.state == 'chase':
+            # do line check if seen player
+            player_center = level.player_rect.center
+            vector = pg.Vector2(player_center) - pg.Vector2(self.rect.center)
+            linex, liney = vector.normalize()
+            x = self.rect.centerx; y = self.rect.centery
+            for i in range(100):
+                x += linex; y += liney
+                if not level.touched(pg.Rect(x, y, 1, 1)):
+                    self.state = 'idle'
+                    break
+            if vector.magnitude() > 100:
+                self.state = 'idle'
+            # set direction to face player
+            self.direction = math.degrees(math.atan2(vector.x, vector.y))
+            self.direction = self.direction % 360
+        print(self.state)
+        self.rect.x += self.speed * math.cos(self.direction)
+        self.rect.y += self.speed * math.sin(self.direction)

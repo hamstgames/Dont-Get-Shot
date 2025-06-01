@@ -2,6 +2,7 @@ import pygame as pg
 from level import Level
 from constants import *
 pg.init()
+pg.mixer.init()
 
 class Main:
     def __init__(self):

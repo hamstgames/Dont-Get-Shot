@@ -13,6 +13,7 @@ class Level:
         self.particles = pg.sprite.Group()
         self.walls = pg.sprite.Group()
         self.touchable = pg.sprite.Group()
+        self.enemies = pg.sprite.Group()
         walls = [[0, 0, 50, 50], [50, 50, 50, 50], [100, 100, 50, 50]]
         for wall in walls:
             Wall([self.all_sprites, self.walls, self.touchable], *wall)
@@ -20,8 +21,9 @@ class Level:
         self.shoot_timer = PressTimer(100)
         self.change_timer = PressTimer(100)
         self.change_timer.start_timer()
-        self.inventory = ['rifle','shotgun','handgun','revolver']
+        self.inventory = ['rifle','shotgun','handgun','revolver', 'rifle2']
         self.inventory_index = 0
+        self.test_enemy = Enemy([self.all_sprites, self.enemies], 100, 100, pg.Surface((10, 10)), 1)
 
     def touched(self, rect=None):
         rect = self.player_rect if rect is None else rect
@@ -64,6 +66,7 @@ class Level:
         self.walls.update(self)
         self.bullets.update(self)
         self.particles.update(self)
+        self.enemies.update(self)
         self.all_sprites.draw(main.surface)
         if self.flip:
             main.surface.blit(self.player_flip, self.player_rect)
@@ -89,4 +92,5 @@ class Level:
                     math.cos(math.radians(angle)), math.sin(math.radians(angle)))
                 Bullet([self.all_sprites, self.bullets], *rect.center, 
                     direction, angle, gundata['bulletspeed'])
+            gundata['sound'].play()
             self.shoot_timer.start_timer()
