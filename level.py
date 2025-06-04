@@ -7,6 +7,7 @@ class Level:
         self.player_image = IMAGES['player']
         self.player_flip = pg.transform.flip(self.player_image, True, False)
         self.player_rect:pg.Rect = self.player_image.get_rect(center=PLAYERPOS)
+        self.player_health = PLAYERHEALTH
         self.movex = 0; self.movey = 0
         self.all_sprites = pg.sprite.Group()
         self.bullets = pg.sprite.Group()
@@ -22,8 +23,8 @@ class Level:
         self.change_timer = PressTimer(100)
         self.change_timer.start_timer()
         self.inventory = ['rifle','shotgun','handgun','revolver', 'rifle2']
-        self.inventory_index = 0
-        self.test_enemy = Enemy([self.all_sprites, self.enemies], 100, 100, pg.Surface((10, 10)), 1)
+        self.inventory_index = 0; self.gunmode = 0
+        self.test_enemy = Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
 
     def touched(self, rect=None):
         rect = self.player_rect if rect is None else rect
@@ -56,17 +57,25 @@ class Level:
                 self.inventory_index -= 1
                 if self.inventory_index < 0:
                     self.inventory_index = len(self.inventory) - 1
+                self.gunmode = 0
                 self.change_timer.start_timer()
             if keys[pg.K_e]:
                 self.inventory_index += 1
                 self.inventory_index %= len(self.inventory)
+                self.gunmode = 0
                 self.change_timer.start_timer()
         gundata = GUNDATA[self.inventory[self.inventory_index]]
+        if 'modes' in gundata:
+            for event in pg.event.get():
+                if event.type == pg.MOUSEWHEEL:
+                    self.gunmode += event.y
+                    self.gunmode %= len(gundata['modes'])
+            gundata = gundata['modes'][self.gunmode]
         self.shoot_timer.duration = gundata['cooldown'] * 1000
-        self.walls.update(self)
-        self.bullets.update(self)
-        self.particles.update(self)
-        self.enemies.update(self)
+        self.walls.update(self, main)
+        self.bullets.update(self, main)
+        self.particles.update(self, main)
+        self.enemies.update(self, main)
         self.all_sprites.draw(main.surface)
         if self.flip:
             main.surface.blit(self.player_flip, self.player_rect)
@@ -82,7 +91,8 @@ class Level:
         playerx, playery = self.player_rect.center
         rect = gun.get_rect(center=(playerx, playery))
         direction = pg.Vector2(mouse_pos[0] - playerx, mouse_pos[1] - playery)
-        direction = direction.normalize()
+        try: direction = direction.normalize()
+        except: direction = pg.Vector2(0, 0)
         rect.x += round(direction.x * 20); rect.y += round(direction.y * 20)
         main.surface.blit(gun, rect)
         if pg.mouse.get_pressed()[0] and self.shoot_timer.update():
@@ -91,6 +101,12 @@ class Level:
                 direction = pg.Vector2(
                     math.cos(math.radians(angle)), math.sin(math.radians(angle)))
                 Bullet([self.all_sprites, self.bullets], *rect.center, 
-                    direction, angle, gundata['bulletspeed'])
+                    direction, angle, gundata['bulletspeed'], gundata['damage'])
             gundata['sound'].play()
             self.shoot_timer.start_timer()
+
+        # draw the health bar
+        draw_text(f'Health: {self.player_health}', pg.font.SysFont(None, 17), 
+                  BLACK, main.surface, 7, 7, 'left')
+        pg.draw.rect(main.surface, BLACK, (8, 18, PLAYERHEALTH*5 + 4, 9))
+        pg.draw.rect(main.surface, LIGHTRED, (10, 20, self.player_health*5, 5))

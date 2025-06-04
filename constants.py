@@ -1,6 +1,5 @@
 from pygame_utils import * #type:ignore[wildcard-import]
 from pathlib import Path
-from typing import Literal
 from pygame.transform import scale
 pg.mixer.init()
 
@@ -14,10 +13,12 @@ WINSURFACE = (WINSW, WINSH)
 WINTIMES = WINW / WINSW
 
 FPS = 60
+TPS = 10
 
 PLAYERSIZE = (50, 50)
 PLAYERPOS = (WINSW // 2, WINSH // 2)
 PLAYERSPEED = 2
+PLAYERHEALTH = 20
 
 IMAGES: dict[str, pg.Surface] = {}
 SOUNDS = {}
@@ -40,7 +41,7 @@ GUNDATA = {
         "image": scale1_2(IMAGES["revolver"]),
         "quantity": 1,
         "sound": SOUNDS["revolver"],
-        "mode": None
+        "damage": 4
     }, "handgun": {
         "cooldown": 0.2,
         "bulletspeed": 15,
@@ -48,7 +49,7 @@ GUNDATA = {
         "image": scale1_2(IMAGES["handgun"]),
         "quantity": 1,
         "sound": SOUNDS["handgun"],
-        "mode": None
+        "damage": 3
     }, "rifle": {
         "cooldown": 0.1,
         "bulletspeed": 20,
@@ -56,7 +57,7 @@ GUNDATA = {
         "image": scale1_2(IMAGES["rifle"]),
         "quantity": 1,
         "sound": SOUNDS["rifle"],
-        "mode": None
+        "damage": 1.5
     }, "shotgun": {
         "cooldown": 0.6,
         "bulletspeed": 15,
@@ -64,14 +65,26 @@ GUNDATA = {
         "image": scale1_2(IMAGES["shotgun"]),
         "quantity": 6,
         "sound": SOUNDS["shotgun"],
-        "mode": None
+        "damage": 2
     }, "rifle2": {
-        "cooldown": 0.08,
-        "bulletspeed": 20,
-        "deviation": 3,
-        "image": scale1_2(IMAGES["rifle2"]),
-        "quantity": 1,
-        "sound": SOUNDS["rifle2"],
-        "mode": ["auto", "burst"]
+        "modes": [
+            { # auto
+                "cooldown": 0.08,
+                "bulletspeed": 20,
+                "deviation": 3,
+                "image": scale1_2(IMAGES["rifle2"]),
+                "quantity": 1,
+                "sound": SOUNDS["rifle2"],
+                "damage": 2
+            }, { # burst
+                "cooldown": 0.2,
+                "bulletspeed": 20,
+                "deviation": 3,
+                "image": scale1_2(IMAGES["rifle2"]),
+                "quantity": 3,
+                "sound": SOUNDS["rifle2"],
+                "damage": 2
+            }
+        ]
     }
 }

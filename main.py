@@ -18,6 +18,8 @@ class Main:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.running = False
+                # put back event for level.py to listen to
+                pg.event.post(event)
             self.level.update(self)
             surface = pg.transform.scale(self.surface, WINSIZE)
             self.screen.blit(surface, (0, 0))
