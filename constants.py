@@ -32,7 +32,6 @@ for image in IMAGESPATH.glob("*.*"):
 for sound in SOUNDPATH.glob("*.*"):
     SOUNDS[sound.stem] = pg.mixer.Sound(sound)
 
-# Gun pictures from https://enterthegungeon.fandom.com/wiki/Guns
 GUNDATA = {
     "revolver": {
         "cooldown": 0.2,
