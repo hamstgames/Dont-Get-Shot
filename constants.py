@@ -56,7 +56,7 @@ GUNDATA = {
         "image": scale1_2(IMAGES["rifle"]),
         "quantity": 1,
         "sound": SOUNDS["rifle"],
-        "damage": 1.5
+        "damage": 2
     }, "shotgun": {
         "cooldown": 0.6,
         "bulletspeed": 15,
@@ -74,7 +74,7 @@ GUNDATA = {
                 "image": scale1_2(IMAGES["rifle2"]),
                 "quantity": 1,
                 "sound": SOUNDS["rifle2"],
-                "damage": 2
+                "damage": 1.5
             }, { # burst
                 "cooldown": 0.2,
                 "bulletspeed": 20,

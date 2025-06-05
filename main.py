@@ -13,6 +13,7 @@ class Main:
         self.level = Level()
     
     def run_game(self):
+        alive = True
         while self.running:
             self.clock.tick(FPS)
             for event in pg.event.get():
@@ -20,7 +21,8 @@ class Main:
                     self.running = False
                 # put back event for level.py to listen to
                 pg.event.post(event)
-            self.level.update(self)
+            if alive: alive = self.level.update(self)
+            else: self.level.game_over(self)
             surface = pg.transform.scale(self.surface, WINSIZE)
             self.screen.blit(surface, (0, 0))
             pg.display.flip()

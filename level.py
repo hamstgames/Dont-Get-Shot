@@ -110,3 +110,8 @@ class Level:
                   BLACK, main.surface, 7, 7, 'left')
         pg.draw.rect(main.surface, BLACK, (8, 18, PLAYERHEALTH*5 + 4, 9))
         pg.draw.rect(main.surface, LIGHTRED, (10, 20, self.player_health*5, 5))
+        return self.player_health > 0
+    
+    def game_over(self, main):
+        draw_text('GAME OVER', pg.font.SysFont(None, 100), BLACK, 
+                  main.surface, WINSW//2, WINSH//2, 'center')
