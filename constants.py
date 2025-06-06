@@ -6,7 +6,7 @@ pg.mixer.init()
 def scale1_2(image: pg.Surface) -> pg.Surface:
     return scale(image, (image.get_width() * 1.2, image.get_height() * 1.2))
 
-WINW = 800; WINH = 600
+WINW = 1500; WINH = 800
 WINSIZE = (WINW, WINH)
 WINSW = WINW // 2; WINSH = WINH // 2
 WINSURFACE = (WINSW, WINSH)
@@ -17,8 +17,8 @@ TPS = 10
 
 PLAYERSIZE = (50, 50)
 PLAYERPOS = (WINSW // 2, WINSH // 2)
-PLAYERSPEED = 2
-PLAYERHEALTH = 20
+PLAYERSPEED = 3
+PLAYERHEALTH = 100
 
 IMAGES: dict[str, pg.Surface] = {}
 SOUNDS = {}
@@ -76,12 +76,12 @@ GUNDATA = {
                 "sound": SOUNDS["rifle2"],
                 "damage": 1.5
             }, { # burst
-                "cooldown": 0.2,
+                "cooldown": 0.25,
                 "bulletspeed": 20,
                 "deviation": 3,
                 "image": scale1_2(IMAGES["rifle2"]),
                 "quantity": 3,
-                "sound": SOUNDS["rifle2"],
+                "sound": SOUNDS["handgun"],
                 "damage": 2
             }
         ]

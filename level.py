@@ -15,16 +15,23 @@ class Level:
         self.walls = pg.sprite.Group()
         self.touchable = pg.sprite.Group()
         self.enemies = pg.sprite.Group()
+        self.blood = pg.sprite.Group()
         walls = [[0, 0, 50, 50], [50, 50, 50, 50], [100, 100, 50, 50]]
         for wall in walls:
             Wall([self.all_sprites, self.walls, self.touchable], *wall)
+        Wall([self.all_sprites, self.walls, self.touchable], -100, -500, 50, 1000)
+        Wall([self.all_sprites, self.walls, self.touchable], 500, -500, 50, 1000)
         self.flip = False
         self.shoot_timer = PressTimer(100)
         self.change_timer = PressTimer(100)
         self.change_timer.start_timer()
         self.inventory = ['rifle','shotgun','handgun','revolver', 'rifle2']
         self.inventory_index = 0; self.gunmode = 0
-        self.test_enemy = Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
+        Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
+        Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
+        Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
+        Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
+        Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
 
     def touched(self, rect=None):
         rect = self.player_rect if rect is None else rect
@@ -33,7 +40,7 @@ class Level:
         return collisions == -1
 
     def update(self, main):
-        main.surface.fill(WHITE)
+        main.surface.fill(LIGHTBLUE)
         keys = pg.key.get_pressed()
         self.movex, self.movey = 0, 0
         if keys[pg.K_a]:
@@ -72,10 +79,12 @@ class Level:
                     self.gunmode %= len(gundata['modes'])
             gundata = gundata['modes'][self.gunmode]
         self.shoot_timer.duration = gundata['cooldown'] * 1000
+        self.blood.update(self, main)
         self.walls.update(self, main)
         self.bullets.update(self, main)
         self.particles.update(self, main)
         self.enemies.update(self, main)
+        self.blood.draw(main.surface)
         self.all_sprites.draw(main.surface)
         if self.flip:
             main.surface.blit(self.player_flip, self.player_rect)
@@ -100,8 +109,8 @@ class Level:
                 angle += randint(-gundata['deviation'], gundata['deviation'])
                 direction = pg.Vector2(
                     math.cos(math.radians(angle)), math.sin(math.radians(angle)))
-                Bullet([self.all_sprites, self.bullets], *rect.center, 
-                    direction, angle, gundata['bulletspeed'], gundata['damage'])
+                Bullet([self.all_sprites, self.bullets], *rect.center, direction, angle, 
+                       gundata['bulletspeed'], gundata['damage'], False)
             gundata['sound'].play()
             self.shoot_timer.start_timer()
 
