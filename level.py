@@ -25,7 +25,7 @@ class Level:
         self.shoot_timer = PressTimer(100)
         self.change_timer = PressTimer(100)
         self.change_timer.start_timer()
-        self.inventory = ['rifle','shotgun','handgun','revolver', 'rifle2']
+        self.inventory = ['microgun','rifle','shotgun','handgun','revolver', 'rifle2']
         self.inventory_index = 0; self.gunmode = 0
         Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
         Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
@@ -40,7 +40,7 @@ class Level:
         return collisions == -1
 
     def update(self, main):
-        main.surface.fill(LIGHTBLUE)
+        main.surface.fill(GRAY)
         keys = pg.key.get_pressed()
         self.movex, self.movey = 0, 0
         if keys[pg.K_a]:
@@ -78,17 +78,6 @@ class Level:
                     self.gunmode += event.y
                     self.gunmode %= len(gundata['modes'])
             gundata = gundata['modes'][self.gunmode]
-        self.shoot_timer.duration = gundata['cooldown'] * 1000
-        self.blood.update(self, main)
-        self.walls.update(self, main)
-        self.bullets.update(self, main)
-        self.particles.update(self, main)
-        self.enemies.update(self, main)
-        self.blood.draw(main.surface)
-        self.all_sprites.draw(main.surface)
-        if self.flip:
-            main.surface.blit(self.player_flip, self.player_rect)
-        else: main.surface.blit(self.player_image, self.player_rect)
         mouse_pos = [float(a) for a in pg.mouse.get_pos()]
         mouse_pos[0] /= WINTIMES; mouse_pos[1] /= WINTIMES
         angle = math.degrees(math.atan2(mouse_pos[1] - self.player_rect.centery, 
@@ -103,7 +92,6 @@ class Level:
         try: direction = direction.normalize()
         except: direction = pg.Vector2(0, 0)
         rect.x += round(direction.x * 20); rect.y += round(direction.y * 20)
-        main.surface.blit(gun, rect)
         if pg.mouse.get_pressed()[0] and self.shoot_timer.update():
             for _ in range(gundata['quantity']):
                 angle += randint(-gundata['deviation'], gundata['deviation'])
@@ -112,7 +100,25 @@ class Level:
                 Bullet([self.all_sprites, self.bullets], *rect.center, direction, angle, 
                        gundata['bulletspeed'], gundata['damage'], False)
             gundata['sound'].play()
+            self.player_rect.x -= math.cos(math.radians(angle)) * gundata['kickback']
+            if self.touched(): self.movex += math.cos(math.radians(angle)) * gundata['kickback']
+            self.player_rect.x += math.cos(math.radians(angle)) * gundata['kickback']
+            self.player_rect.y -= math.sin(math.radians(angle)) * gundata['kickback']
+            if self.touched(): self.movey += math.sin(math.radians(angle)) * gundata['kickback']
+            self.player_rect.y += math.sin(math.radians(angle)) * gundata['kickback']
             self.shoot_timer.start_timer()
+        self.blood.update(self, main)
+        self.blood.draw(main.surface)
+        main.surface.blit(gun, rect)
+        self.shoot_timer.duration = gundata['cooldown'] * 1000
+        self.walls.update(self, main)
+        self.bullets.update(self, main)
+        self.particles.update(self, main)
+        self.enemies.update(self, main)
+        self.all_sprites.draw(main.surface)
+        if self.flip:
+            main.surface.blit(self.player_flip, self.player_rect)
+        else: main.surface.blit(self.player_image, self.player_rect)
 
         # draw the health bar
         draw_text(f'Health: {self.player_health}', pg.font.SysFont(None, 17), 

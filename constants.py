@@ -18,7 +18,7 @@ TPS = 10
 PLAYERSIZE = (50, 50)
 PLAYERPOS = (WINSW // 2, WINSH // 2)
 PLAYERSPEED = 3
-PLAYERHEALTH = 100
+PLAYERHEALTH = 20
 
 IMAGES: dict[str, pg.Surface] = {}
 SOUNDS = {}
@@ -40,7 +40,8 @@ GUNDATA = {
         "image": scale1_2(IMAGES["revolver"]),
         "quantity": 1,
         "sound": SOUNDS["revolver"],
-        "damage": 4
+        "damage": 4,
+        "kickback": 4
     }, "handgun": {
         "cooldown": 0.2,
         "bulletspeed": 15,
@@ -48,7 +49,8 @@ GUNDATA = {
         "image": scale1_2(IMAGES["handgun"]),
         "quantity": 1,
         "sound": SOUNDS["handgun"],
-        "damage": 3
+        "damage": 3,
+        "kickback": 2
     }, "rifle": {
         "cooldown": 0.1,
         "bulletspeed": 20,
@@ -56,7 +58,8 @@ GUNDATA = {
         "image": scale1_2(IMAGES["rifle"]),
         "quantity": 1,
         "sound": SOUNDS["rifle"],
-        "damage": 2
+        "damage": 2,
+        "kickback": 2
     }, "shotgun": {
         "cooldown": 0.6,
         "bulletspeed": 15,
@@ -64,7 +67,8 @@ GUNDATA = {
         "image": scale1_2(IMAGES["shotgun"]),
         "quantity": 6,
         "sound": SOUNDS["shotgun"],
-        "damage": 2
+        "damage": 2,
+        "kickback": 10
     }, "rifle2": {
         "modes": [
             { # auto
@@ -74,7 +78,8 @@ GUNDATA = {
                 "image": scale1_2(IMAGES["rifle2"]),
                 "quantity": 1,
                 "sound": SOUNDS["rifle2"],
-                "damage": 1.5
+                "damage": 1.5,
+                "kickback": 2
             }, { # burst
                 "cooldown": 0.25,
                 "bulletspeed": 20,
@@ -82,8 +87,18 @@ GUNDATA = {
                 "image": scale1_2(IMAGES["rifle2"]),
                 "quantity": 3,
                 "sound": SOUNDS["handgun"],
-                "damage": 2
+                "damage": 2,
+                "kickback": 2
             }
         ]
+    }, "microgun": {
+        "cooldown": 0.05,
+        "bulletspeed": 20,
+        "deviation": 5,
+        "image": scale1_2(IMAGES["microgun"]),
+        "quantity": 1,
+        "sound": SOUNDS["microgun"],
+        "damage": 1.5,
+        "kickback": 2
     }
 }
