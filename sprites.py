@@ -107,7 +107,8 @@ class Enemy(pg.sprite.Sprite):
                 x += linex; y += liney
                 if not level.touched(pg.Rect(x, y, 1, 1)):
                     break
-                # pg.draw.rect(main.surface, RED, pg.Rect(x, y, 1, 1))
+                if level.debug:
+                    pg.draw.rect(main.surface, RED, pg.Rect(x, y, 1, 1))
             else:
                 if vector.magnitude() < 200:
                     self.state = 'chase'
@@ -122,7 +123,8 @@ class Enemy(pg.sprite.Sprite):
                 if not level.touched(pg.Rect(x, y, 1, 1)):
                     self.state = 'idle'
                     break
-                # pg.draw.rect(main.surface, RED, pg.Rect(x, y, 1, 1))
+                if level.debug:
+                    pg.draw.rect(main.surface, RED, pg.Rect(x, y, 1, 1))
             if vector.magnitude() > 200:
                 self.state = 'idle'
             if vector.magnitude() < 50:
@@ -148,3 +150,6 @@ class Enemy(pg.sprite.Sprite):
         if not level.touched(self.rect):
             self.rect.y -= self.speed * math.sin(self.direction) * self.move
         if self.health <= 0: self.kill()
+        if level.debug:
+            rect = self.rect.inflate(2, 2)
+            pg.draw.rect(main.surface, RED, rect, 1)

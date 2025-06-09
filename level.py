@@ -25,13 +25,14 @@ class Level:
         self.shoot_timer = PressTimer(100)
         self.change_timer = PressTimer(100)
         self.change_timer.start_timer()
-        self.inventory = ['microgun','rifle','shotgun','handgun','revolver', 'rifle2']
+        self.inventory = ['submachinegun','rifle','shotgun','handgun','revolver', 'rifle2']
         self.inventory_index = 0; self.gunmode = 0
         Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
         Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
         Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
         Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
         Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
+        self.debug = True
 
     def touched(self, rect=None):
         rect = self.player_rect if rect is None else rect

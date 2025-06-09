@@ -19,6 +19,9 @@ class Main:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.running = False
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_ESCAPE:
+                        self.running = False
                 # put back event for level.py to listen to
                 pg.event.post(event)
             if alive: alive = self.level.update(self)

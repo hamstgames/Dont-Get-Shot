@@ -41,7 +41,7 @@ GUNDATA = {
         "quantity": 1,
         "sound": SOUNDS["revolver"],
         "damage": 4,
-        "kickback": 4
+        "kickback": 0
     }, "handgun": {
         "cooldown": 0.2,
         "bulletspeed": 15,
@@ -50,7 +50,7 @@ GUNDATA = {
         "quantity": 1,
         "sound": SOUNDS["handgun"],
         "damage": 3,
-        "kickback": 2
+        "kickback": 0
     }, "rifle": {
         "cooldown": 0.1,
         "bulletspeed": 20,
@@ -59,7 +59,7 @@ GUNDATA = {
         "quantity": 1,
         "sound": SOUNDS["rifle"],
         "damage": 2,
-        "kickback": 2
+        "kickback": 0
     }, "shotgun": {
         "cooldown": 0.6,
         "bulletspeed": 15,
@@ -79,7 +79,7 @@ GUNDATA = {
                 "quantity": 1,
                 "sound": SOUNDS["rifle2"],
                 "damage": 1.5,
-                "kickback": 2
+                "kickback": 0
             }, { # burst
                 "cooldown": 0.25,
                 "bulletspeed": 20,
@@ -88,10 +88,10 @@ GUNDATA = {
                 "quantity": 3,
                 "sound": SOUNDS["handgun"],
                 "damage": 2,
-                "kickback": 2
+                "kickback": 0
             }
         ]
-    }, "microgun": {
+    }, "submachinegun": {
         "cooldown": 0.05,
         "bulletspeed": 20,
         "deviation": 5,
@@ -99,6 +99,6 @@ GUNDATA = {
         "quantity": 1,
         "sound": SOUNDS["microgun"],
         "damage": 1.5,
-        "kickback": 2
+        "kickback": 0
     }
 }
