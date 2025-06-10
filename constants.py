@@ -41,16 +41,18 @@ GUNDATA = {
         "quantity": 1,
         "sound": SOUNDS["revolver"],
         "damage": 4,
-        "kickback": 0
+        "kickback": 0,
+        "once_a_time": True
     }, "handgun": {
         "cooldown": 0.2,
         "bulletspeed": 15,
-        "deviation": 0,
+        "deviation": 10,
         "image": scale1_2(IMAGES["handgun"]),
         "quantity": 1,
         "sound": SOUNDS["handgun"],
         "damage": 3,
-        "kickback": 0
+        "kickback": 0,
+        "once_a_time": False
     }, "rifle": {
         "cooldown": 0.1,
         "bulletspeed": 20,
@@ -59,7 +61,8 @@ GUNDATA = {
         "quantity": 1,
         "sound": SOUNDS["rifle"],
         "damage": 2,
-        "kickback": 0
+        "kickback": 0,
+        "once_a_time": False
     }, "shotgun": {
         "cooldown": 0.6,
         "bulletspeed": 15,
@@ -68,7 +71,8 @@ GUNDATA = {
         "quantity": 6,
         "sound": SOUNDS["shotgun"],
         "damage": 2,
-        "kickback": 10
+        "kickback": 10,
+        "once_a_time": True
     }, "rifle2": {
         "modes": [
             { # auto
@@ -79,7 +83,8 @@ GUNDATA = {
                 "quantity": 1,
                 "sound": SOUNDS["rifle2"],
                 "damage": 1.5,
-                "kickback": 0
+                "kickback": 0,
+                "once_a_time": False
             }, { # burst
                 "cooldown": 0.25,
                 "bulletspeed": 20,
@@ -88,7 +93,8 @@ GUNDATA = {
                 "quantity": 3,
                 "sound": SOUNDS["handgun"],
                 "damage": 2,
-                "kickback": 0
+                "kickback": 0,
+                "once_a_time": True
             }
         ]
     }, "submachinegun": {
@@ -99,6 +105,7 @@ GUNDATA = {
         "quantity": 1,
         "sound": SOUNDS["microgun"],
         "damage": 1.5,
-        "kickback": 0
+        "kickback": 0,
+        "once_a_time": False
     }
 }

@@ -23,8 +23,6 @@ class Level:
         Wall([self.all_sprites, self.walls, self.touchable], 500, -500, 50, 1000)
         self.flip = False
         self.shoot_timer = PressTimer(100)
-        self.change_timer = PressTimer(100)
-        self.change_timer.start_timer()
         self.inventory = ['submachinegun','rifle','shotgun','handgun','revolver', 'rifle2']
         self.inventory_index = 0; self.gunmode = 0
         Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
@@ -60,18 +58,28 @@ class Level:
             self.player_rect.y += PLAYERSPEED
             if self.touched(): self.movey = -PLAYERSPEED
             self.player_rect.y -= PLAYERSPEED
-        if self.change_timer.update():
-            if keys[pg.K_q]:
+        # if self.change_timer.update():
+        #     if keys[pg.K_q]:
+        #         self.inventory_index -= 1
+        #         if self.inventory_index < 0:
+        #             self.inventory_index = len(self.inventory) - 1
+        #         self.gunmode = 0
+        #         self.change_timer.start_timer()
+        #     if keys[pg.K_e]:
+        #         self.inventory_index += 1
+        #         self.inventory_index %= len(self.inventory)
+        #         self.gunmode = 0
+        #         self.change_timer.start_timer()
+        for event in pg.event.get(pg.KEYDOWN):
+            if event.key == pg.K_q:
                 self.inventory_index -= 1
                 if self.inventory_index < 0:
                     self.inventory_index = len(self.inventory) - 1
                 self.gunmode = 0
-                self.change_timer.start_timer()
-            if keys[pg.K_e]:
+            if event.key == pg.K_e:
                 self.inventory_index += 1
                 self.inventory_index %= len(self.inventory)
                 self.gunmode = 0
-                self.change_timer.start_timer()
         gundata = GUNDATA[self.inventory[self.inventory_index]]
         if 'modes' in gundata:
             for event in pg.event.get():
@@ -93,7 +101,7 @@ class Level:
         try: direction = direction.normalize()
         except: direction = pg.Vector2(0, 0)
         rect.x += round(direction.x * 20); rect.y += round(direction.y * 20)
-        if pg.mouse.get_pressed()[0] and self.shoot_timer.update():
+        if pg.mouse.get_pressed()[0] and self.shoot_timer.update() and not gundata['once_a_time']:
             for _ in range(gundata['quantity']):
                 angle += randint(-gundata['deviation'], gundata['deviation'])
                 direction = pg.Vector2(
@@ -108,6 +116,22 @@ class Level:
             if self.touched(): self.movey += math.sin(math.radians(angle)) * gundata['kickback']
             self.player_rect.y += math.sin(math.radians(angle)) * gundata['kickback']
             self.shoot_timer.start_timer()
+        for event in pg.event.get(pg.MOUSEBUTTONDOWN):
+            if event.button == 1 and self.shoot_timer.update() and gundata['once_a_time']:
+                for _ in range(gundata['quantity']):
+                    angle += randint(-gundata['deviation'], gundata['deviation'])
+                    direction = pg.Vector2(
+                        math.cos(math.radians(angle)), math.sin(math.radians(angle)))
+                    Bullet([self.all_sprites, self.bullets], *rect.center, direction, angle, 
+                        gundata['bulletspeed'], gundata['damage'], False)
+                gundata['sound'].play()
+                self.player_rect.x -= math.cos(math.radians(angle)) * gundata['kickback']
+                if self.touched(): self.movex += math.cos(math.radians(angle)) * gundata['kickback']
+                self.player_rect.x += math.cos(math.radians(angle)) * gundata['kickback']
+                self.player_rect.y -= math.sin(math.radians(angle)) * gundata['kickback']
+                if self.touched(): self.movey += math.sin(math.radians(angle)) * gundata['kickback']
+                self.player_rect.y += math.sin(math.radians(angle)) * gundata['kickback']
+                self.shoot_timer.start_timer()
         self.blood.update(self, main)
         self.blood.draw(main.surface)
         main.surface.blit(gun, rect)
