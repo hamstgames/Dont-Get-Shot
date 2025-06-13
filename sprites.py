@@ -16,18 +16,27 @@ class Wall(pg.sprite.Sprite):
         self.rect.y += level.movey
 
 class Explosion(pg.sprite.Sprite):
-    def __init__(self, groups, x, y, surface, time):
-        super().__init__(groups)
-        self.image = pg.transform.rotate(surface, randint(0, 360))
+    def __init__(self, groups, x, y, radius, time, withlevel=True):
+        super().__init__(groups) # print(radius)
+        self.image = pg.Surface((radius*2, radius*2)).convert_alpha()
+        self.image.fill((0,0,0,0))
+        pg.draw.circle(self.image, YELLOW, (radius, radius), radius)
         self.rect = self.image.get_rect(center=(x, y))
         self.start = pg.time.get_ticks()
         self.time = time
+        self.withlevel = withlevel
 
     def update(self, level, *_):
-        self.rect.x += level.movex
-        self.rect.y += level.movey
-        if pg.time.get_ticks() - self.start > self.time:
-            self.kill()
+        if self.withlevel:
+            self.rect.x += level.movex
+            self.rect.y += level.movey
+        if pg.time.get_ticks() - self.start > self.time: self.kill()
+        # make circle bigger
+        w = self.rect.width+1; h = self.rect.height+1
+        self.image = pg.Surface((w, h)).convert_alpha()
+        self.image.fill((0,0,0,0))
+        pg.draw.circle(self.image, YELLOW, (w // 2, h // 2), w // 2)
+        self.rect = self.image.get_rect(center=self.rect.center)
 
 class Bullet(pg.sprite.Sprite):
     def __init__(self, groups, x, y, direction, angle, speed, damage, killplayer=True):
@@ -37,7 +46,9 @@ class Bullet(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=(x, y))
         self.direction = direction
         self.timer = PressTimer(1000)
+        self.explo = PressTimer(0)
         self.timer.start_timer()
+        self.explo.start_timer()
         self.speed = speed
         self.damage = damage
         self.killplayer = killplayer
@@ -49,17 +60,20 @@ class Bullet(pg.sprite.Sprite):
         self.rect.y += level.movey
         if self.timer.update(): self.kill()
         if not level.touched(self.rect):
-            Explosion(self.groups(), *self.rect.center, IMAGES["bullet_explode"], 100)
+            Explosion(self.groups(), *self.rect.center, 5, 100)
             self.kill()
         if self.rect.colliderect(level.player_rect) and self.killplayer:
             level.player_health -= self.damage; self.kill()
         collisions = pg.sprite.spritecollide(self, level.enemies, False) # pyright: ignore[reportArgumentType]
         for enemy in collisions:
             enemy.health -= self.damage
-            Explosion(self.groups(), *self.rect.center, IMAGES["bullet_explode"], 100)
+            Explosion(self.groups(), *self.rect.center, 5, 100)
             for _ in range(3): 
                 Blood([level.blood], *self.rect.center, IMAGES["blood2"], randint(0, 360))
             self.kill()
+        if self.explo.update():
+            Explosion(self.groups(), *self.rect.center, 3, 50, False)
+            self.explo.allways_false()
 
 class Blood(pg.sprite.Sprite):
     def __init__(self, groups, x, y, surface, angle):
@@ -70,8 +84,8 @@ class Blood(pg.sprite.Sprite):
         w *= multiplier; h *= multiplier
         self.image = pg.transform.scale(surface, (w, h // 2))
         self.rect = self.image.get_rect(center=(x, y))
-        self.rect.x += round(math.cos(angle * math.pi / 180) * 10)
-        self.rect.y += round(math.sin(angle * math.pi / 180) * 10)
+        self.rect.x += round(math.cos(angle * math.pi / 180) * randint(10, 30))
+        self.rect.y += round(math.sin(angle * math.pi / 180) * randint(10, 30))
     
     def update(self, level, *_):
         self.rect.x += level.movex

@@ -1,4 +1,4 @@
-from pygame_utils import * #type:ignore[wildcard-import]
+from pygame_utils import * # pyright:ignore[reportWildcardImportFromLibrary]
 from pathlib import Path
 from pygame.transform import scale
 pg.mixer.init()
@@ -93,17 +93,17 @@ GUNDATA = {
                 "quantity": 3,
                 "sound": SOUNDS["handgun"],
                 "damage": 2,
-                "kickback": 0,
-                "once_a_time": True
+                "kickback": 1,
+                "once_a_time": False
             }
         ]
     }, "submachinegun": {
         "cooldown": 0.05,
         "bulletspeed": 20,
         "deviation": 5,
-        "image": scale1_2(IMAGES["microgun"]),
+        "image": scale1_2(IMAGES["submachinegun"]),
         "quantity": 1,
-        "sound": SOUNDS["microgun"],
+        "sound": SOUNDS["submachinegun"],
         "damage": 1.5,
         "kickback": 0,
         "once_a_time": False
