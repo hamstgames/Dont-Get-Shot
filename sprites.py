@@ -39,7 +39,7 @@ class Explosion(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center)
 
 class Bullet(pg.sprite.Sprite):
-    def __init__(self, groups, x, y, direction, angle, speed, damage, penetrative, killplayer=True):
+    def __init__(self, groups, x, y, direction, angle, speed, damage, killplayer=True):
         super().__init__(groups)
         self.image = IMAGES["bullet"]
         self.image = pg.transform.rotate(self.image, -angle)
@@ -52,7 +52,6 @@ class Bullet(pg.sprite.Sprite):
         self.speed = speed
         self.damage = damage
         self.killplayer = killplayer
-        self.penetrative = penetrative
 
     def update(self, level, *_):
         self.rect.x += self.direction[0] * self.speed
@@ -63,16 +62,56 @@ class Bullet(pg.sprite.Sprite):
         if not level.touched(self.rect):
             Explosion(self.groups(), *self.rect.center, 5, 100)
             self.kill()
-        if self.rect.colliderect(level.player_rect) and self.killplayer:
-            level.player_health -= self.damage; self.kill()
+        if self.rect.colliderect(level.player_rect):
+            if self.killplayer: level.player_health -= self.damage
+            self.kill()
         collisions = pg.sprite.spritecollide(self, level.enemies, False) # pyright: ignore[reportArgumentType]
         for enemy in collisions:
             enemy.health -= self.damage
             for _ in range(3): 
                 Blood([level.blood], *self.rect.center, IMAGES["blood2"], randint(0, 360))
-            if not self.penetrative:
-                Explosion(self.groups(), *self.rect.center, 5, 100)
-                self.kill()
+            Explosion(self.groups(), *self.rect.center, 5, 100)
+            self.kill()
+        if self.explo.update():
+            Explosion(self.groups(), *self.rect.center, 3, 50, False)
+            self.explo.allways_false()
+
+class PBullet(pg.sprite.Sprite):
+    def __init__(self, groups, x, y, direction, angle, speed, damage, killplayer=True):
+        super().__init__(groups)
+        self.image = IMAGES["bullet"]
+        self.image = pg.transform.rotate(self.image, -angle)
+        self.rect = self.image.get_rect(center=(x, y))
+        self.direction = direction
+        self.timer = PressTimer(1000)
+        self.explo = PressTimer(0)
+        self.timer.start_timer()
+        self.explo.start_timer()
+        self.speed = speed
+        self.damage = damage
+        self.killplayer = killplayer
+        self.last_damaged = None
+
+    def update(self, level, *_):
+        self.rect.x += self.direction[0] * self.speed
+        self.rect.y += self.direction[1] * self.speed
+        self.rect.x += level.movex
+        self.rect.y += level.movey
+        if self.timer.update(): self.kill()
+        if not level.touched(self.rect):
+            Explosion(self.groups(), *self.rect.center, 5, 100)
+            self.kill()
+        if self.rect.colliderect(level.player_rect):
+            if self.killplayer: level.player_health -= self.damage
+            self.kill()
+        collisions = pg.sprite.spritecollide(self, level.enemies, False) # pyright: ignore[reportArgumentType]
+        for enemy in collisions:
+            if self.last_damaged != enemy: 
+                enemy.health -= self.damage
+                self.last_damaged = enemy
+            for _ in range(3): 
+                Blood([level.blood], *self.rect.center, IMAGES["blood2"], randint(0, 360))
+            Explosion(self.groups(), *self.rect.center, 5, 100)
         if self.explo.update():
             Explosion(self.groups(), *self.rect.center, 3, 50, False)
             self.explo.allways_false()
@@ -138,29 +177,35 @@ class Enemy(pg.sprite.Sprite):
             vector = pg.Vector2(player_center) - pg.Vector2(self.rect.center)
             linex, liney = vector.normalize()
             x = self.rect.centerx; y = self.rect.centery
+            touch_player = False
             for i in range(200):
                 x += linex; y += liney
-                if not level.touched(pg.Rect(x, y, 1, 1)):
-                    break
+                col_rect = pg.Rect(x, y, 1, 1)
+                if col_rect.colliderect(level.player_rect):
+                    touch_player = True; break
+                if not level.touched(col_rect):
+                    touch_player = False; break
                 if level.debug:
-                    pg.draw.rect(main.surface, RED, pg.Rect(x, y, 1, 1))
-            else:
-                if vector.magnitude() < 200:
-                    self.state = 'chase'
+                    pg.draw.rect(main.surface, RED, col_rect)
+            if touch_player:
+                self.state = 'chase'
         if self.state == 'chase':
             # do line check if seen player
             player_center = level.player_rect.center
             vector = pg.Vector2(player_center) - pg.Vector2(self.rect.center)
             linex, liney = vector.normalize()
             x = self.rect.centerx; y = self.rect.centery
+            touch_player = False
             for i in range(200):
                 x += linex; y += liney
-                if not level.touched(pg.Rect(x, y, 1, 1)):
-                    self.state = 'idle'
-                    break
+                col_rect = pg.Rect(x, y, 1, 1)
+                if col_rect.colliderect(level.player_rect):
+                    touch_player = True; break
+                if not level.touched(col_rect):
+                    touch_player = False; break
                 if level.debug:
-                    pg.draw.rect(main.surface, RED, pg.Rect(x, y, 1, 1))
-            if vector.magnitude() > 200:
+                    pg.draw.rect(main.surface, RED, col_rect)
+            if not touch_player:
                 self.state = 'idle'
             if vector.magnitude() < 50:
                 self.move = 0
@@ -176,7 +221,7 @@ class Enemy(pg.sprite.Sprite):
                 move = move.normalize()
                 x = self.rect.centerx + move.x * 20
                 y = self.rect.centery + move.y * 20
-                Bullet([level.all_sprites, level.bullets], x, y, pos, self.direction, 10, 2, False)
+                Bullet([level.all_sprites, level.bullets], x, y, pos, self.direction, 10, 2)
                 self.shoot_timer.start_timer()
         self.rect.x += round(self.speed * math.cos(self.direction) * self.move)
         if not level.touched(self.rect):

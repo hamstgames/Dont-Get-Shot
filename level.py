@@ -108,8 +108,11 @@ class Level:
                 angle += randint(-gundata['deviation'], gundata['deviation'])
                 direction = pg.Vector2(
                     math.cos(math.radians(angle)), math.sin(math.radians(angle)))
-                Bullet([self.all_sprites, self.bullets], *rect.center, direction, angle, 
-                       gundata['bulletspeed'], gundata['damage'], gundata['penetrative'], False)
+                if not gundata['penetrative']:
+                    Bullet([self.all_sprites, self.bullets], *rect.center, direction, angle, 
+                        gundata['bulletspeed'], gundata['damage'], False)
+                else: PBullet([self.all_sprites, self.bullets], *rect.center, direction, angle,
+                              gundata['bulletspeed'], gundata['damage'], False)
             gundata['sound'].play()
             self.player_rect.x -= math.cos(math.radians(angle)) * gundata['kickback']
             if self.touched(): self.movex += math.cos(math.radians(angle)) * gundata['kickback']
@@ -124,8 +127,11 @@ class Level:
                     angle += randint(-gundata['deviation'], gundata['deviation'])
                     direction = pg.Vector2(
                         math.cos(math.radians(angle)), math.sin(math.radians(angle)))
-                    Bullet([self.all_sprites, self.bullets], *rect.center, direction, angle, 
-                        gundata['bulletspeed'], gundata['damage'], gundata['penetrative'], False)
+                    if not gundata['penetrative']:
+                        Bullet([self.all_sprites, self.bullets], *rect.center, direction, angle, 
+                            gundata['bulletspeed'], gundata['damage'], False)
+                    else: PBullet([self.all_sprites, self.bullets], *rect.center, direction, angle,
+                                  gundata['bulletspeed'], gundata['damage'], False)
                 gundata['sound'].play()
                 self.player_rect.x -= math.cos(math.radians(angle)) * gundata['kickback']
                 if self.touched(): self.movex += math.cos(math.radians(angle)) * gundata['kickback']
