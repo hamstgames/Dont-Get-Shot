@@ -16,6 +16,7 @@ class Level:
         self.touchable = pg.sprite.Group()
         self.enemies = pg.sprite.Group()
         self.blood = pg.sprite.Group()
+        self.corspes = pg.sprite.Group()
         walls = [[0, 0, 50, 50], [50, 50, 50, 50], [100, 100, 50, 50]]
         for wall in walls:
             Wall([self.all_sprites, self.walls, self.touchable], *wall)
@@ -23,13 +24,14 @@ class Level:
         Wall([self.all_sprites, self.walls, self.touchable], 500, -500, 50, 1000)
         self.flip = False
         self.shoot_timer = PressTimer(100)
-        self.inventory = ['submachinegun','rifle','shotgun','handgun','revolver', 'rifle2']
+        self.inventory = ['submachinegun2','submachinegun1','rifle','shotgun','handgun','revolver', 'rifle2']
         self.inventory_index = 0; self.gunmode = 0
-        Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
-        Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
-        Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
-        Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
-        Enemy([self.all_sprites, self.enemies], 150, 50, pg.Surface((10, 10)), 1)
+        Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
+        Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
+        Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
+        Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
+        Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
+        Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
         self.debug = True
 
     def touched(self, rect=None):
@@ -107,7 +109,7 @@ class Level:
                 direction = pg.Vector2(
                     math.cos(math.radians(angle)), math.sin(math.radians(angle)))
                 Bullet([self.all_sprites, self.bullets], *rect.center, direction, angle, 
-                       gundata['bulletspeed'], gundata['damage'], False)
+                       gundata['bulletspeed'], gundata['damage'], gundata['penetrative'], False)
             gundata['sound'].play()
             self.player_rect.x -= math.cos(math.radians(angle)) * gundata['kickback']
             if self.touched(): self.movex += math.cos(math.radians(angle)) * gundata['kickback']
@@ -123,7 +125,7 @@ class Level:
                     direction = pg.Vector2(
                         math.cos(math.radians(angle)), math.sin(math.radians(angle)))
                     Bullet([self.all_sprites, self.bullets], *rect.center, direction, angle, 
-                        gundata['bulletspeed'], gundata['damage'], False)
+                        gundata['bulletspeed'], gundata['damage'], gundata['penetrative'], False)
                 gundata['sound'].play()
                 self.player_rect.x -= math.cos(math.radians(angle)) * gundata['kickback']
                 if self.touched(): self.movex += math.cos(math.radians(angle)) * gundata['kickback']
@@ -132,6 +134,8 @@ class Level:
                 if self.touched(): self.movey += math.sin(math.radians(angle)) * gundata['kickback']
                 self.player_rect.y += math.sin(math.radians(angle)) * gundata['kickback']
                 self.shoot_timer.start_timer()
+        self.corspes.update(self, main)
+        self.corspes.draw(main.surface)
         self.blood.update(self, main)
         self.blood.draw(main.surface)
         main.surface.blit(gun, rect)

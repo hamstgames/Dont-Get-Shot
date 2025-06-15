@@ -2,11 +2,15 @@ from pygame_utils import * # pyright:ignore[reportWildcardImportFromLibrary]
 from pathlib import Path
 from pygame.transform import scale
 pg.mixer.init()
+pg.init()
 
 def scale1_2(image: pg.Surface) -> pg.Surface:
     return scale(image, (image.get_width() * 1.2, image.get_height() * 1.2))
 
-WINW = 1500; WINH = 800
+info = pg.display.Info()
+WINW = info.current_w
+WINH = info.current_h
+print(f"Window size: {WINW}x{WINH}")
 WINSIZE = (WINW, WINH)
 WINSW = WINW // 2; WINSH = WINH // 2
 WINSURFACE = (WINSW, WINSH)
@@ -18,7 +22,7 @@ TPS = 10
 PLAYERSIZE = (50, 50)
 PLAYERPOS = (WINSW // 2, WINSH // 2)
 PLAYERSPEED = 3
-PLAYERHEALTH = 20
+PLAYERHEALTH = 100
 
 IMAGES: dict[str, pg.Surface] = {}
 SOUNDS = {}
@@ -32,17 +36,19 @@ for image in IMAGESPATH.glob("*.*"):
 for sound in SOUNDPATH.glob("*.*"):
     SOUNDS[sound.stem] = pg.mixer.Sound(sound)
 
+# Gun pictures from https://enterthegungeon.fandom.com/wiki/Guns
 GUNDATA = {
     "revolver": {
-        "cooldown": 0.2,
+        "cooldown": 0.016,
         "bulletspeed": 15,
         "deviation": 6,
         "image": scale1_2(IMAGES["revolver"]),
         "quantity": 1,
         "sound": SOUNDS["revolver"],
-        "damage": 4,
+        "damage": 3,
         "kickback": 0,
-        "once_a_time": True
+        "once_a_time": True,
+        "penetrative": False
     }, "handgun": {
         "cooldown": 0.2,
         "bulletspeed": 15,
@@ -50,9 +56,10 @@ GUNDATA = {
         "image": scale1_2(IMAGES["handgun"]),
         "quantity": 1,
         "sound": SOUNDS["handgun"],
-        "damage": 3,
+        "damage": 1,
         "kickback": 0,
-        "once_a_time": False
+        "once_a_time": False,
+        "penetrative": True
     }, "rifle": {
         "cooldown": 0.1,
         "bulletspeed": 20,
@@ -60,9 +67,10 @@ GUNDATA = {
         "image": scale1_2(IMAGES["rifle"]),
         "quantity": 1,
         "sound": SOUNDS["rifle"],
-        "damage": 2,
+        "damage": 3,
         "kickback": 0,
-        "once_a_time": False
+        "once_a_time": False,
+        "penetrative": False
     }, "shotgun": {
         "cooldown": 0.6,
         "bulletspeed": 15,
@@ -70,9 +78,10 @@ GUNDATA = {
         "image": scale1_2(IMAGES["shotgun"]),
         "quantity": 6,
         "sound": SOUNDS["shotgun"],
-        "damage": 2,
+        "damage": 3,
         "kickback": 10,
-        "once_a_time": True
+        "once_a_time": True,
+        "penetrative": False
     }, "rifle2": {
         "modes": [
             { # auto
@@ -82,9 +91,10 @@ GUNDATA = {
                 "image": scale1_2(IMAGES["rifle2"]),
                 "quantity": 1,
                 "sound": SOUNDS["rifle2"],
-                "damage": 1.5,
+                "damage": 3,
                 "kickback": 0,
-                "once_a_time": False
+                "once_a_time": False,
+                "penetrative": False
             }, { # burst
                 "cooldown": 0.25,
                 "bulletspeed": 20,
@@ -92,20 +102,33 @@ GUNDATA = {
                 "image": scale1_2(IMAGES["rifle2"]),
                 "quantity": 3,
                 "sound": SOUNDS["handgun"],
-                "damage": 2,
+                "damage": 3,
                 "kickback": 1,
-                "once_a_time": False
+                "once_a_time": False,
+                "penetrative": False
             }
         ]
-    }, "submachinegun": {
+    }, "submachinegun1": {
         "cooldown": 0.05,
         "bulletspeed": 20,
         "deviation": 5,
         "image": scale1_2(IMAGES["submachinegun"]),
         "quantity": 1,
         "sound": SOUNDS["submachinegun"],
-        "damage": 1.5,
+        "damage": 2.5,
         "kickback": 0,
-        "once_a_time": False
+        "once_a_time": False,
+        "penetrative": False
+    }, "submachinegun2": {
+        "cooldown": 0.067,
+        "bulletspeed": 20,
+        "deviation": 4,
+        "image": scale1_2(IMAGES["submachinegun2"]),
+        "quantity": 1,
+        "sound": SOUNDS["submachinegun"],
+        "damage": 2.5,
+        "kickback": 0,
+        "once_a_time": False,
+        "penetrative": False
     }
 }

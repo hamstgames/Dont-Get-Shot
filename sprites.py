@@ -39,7 +39,7 @@ class Explosion(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center)
 
 class Bullet(pg.sprite.Sprite):
-    def __init__(self, groups, x, y, direction, angle, speed, damage, killplayer=True):
+    def __init__(self, groups, x, y, direction, angle, speed, damage, penetrative, killplayer=True):
         super().__init__(groups)
         self.image = IMAGES["bullet"]
         self.image = pg.transform.rotate(self.image, -angle)
@@ -52,6 +52,7 @@ class Bullet(pg.sprite.Sprite):
         self.speed = speed
         self.damage = damage
         self.killplayer = killplayer
+        self.penetrative = penetrative
 
     def update(self, level, *_):
         self.rect.x += self.direction[0] * self.speed
@@ -67,10 +68,11 @@ class Bullet(pg.sprite.Sprite):
         collisions = pg.sprite.spritecollide(self, level.enemies, False) # pyright: ignore[reportArgumentType]
         for enemy in collisions:
             enemy.health -= self.damage
-            Explosion(self.groups(), *self.rect.center, 5, 100)
             for _ in range(3): 
                 Blood([level.blood], *self.rect.center, IMAGES["blood2"], randint(0, 360))
-            self.kill()
+            if not self.penetrative:
+                Explosion(self.groups(), *self.rect.center, 5, 100)
+                self.kill()
         if self.explo.update():
             Explosion(self.groups(), *self.rect.center, 3, 50, False)
             self.explo.allways_false()
@@ -91,12 +93,31 @@ class Blood(pg.sprite.Sprite):
         self.rect.x += level.movex
         self.rect.y += level.movey
 
+class Corpse(pg.sprite.Sprite):
+    def __init__(self, groups, x, y, surface, level):
+        super().__init__(groups)
+        w = surface.get_width(); h = surface.get_height()
+        self.image = pg.transform.scale(surface, (w, h // 4 * 3))
+        self.rect = self.image.get_rect(center=(x, y))
+        self.timer = PressTimer(100000)
+        self.timer.start_timer()
+        for _ in range(5):
+            Blood(level.blood, *self.rect.center, IMAGES["blood2"], randint(0, 360))
+
+    def update(self, level, *_):
+        self.rect.x += level.movex
+        self.rect.y += level.movey
+        if self.timer.update(): self.kill()
+
+
 class Enemy(pg.sprite.Sprite):
     """A Enemy class to subclass"""
     def __init__(self, groups, x, y, image, speed=0):
         super().__init__(groups)
         self.image = image
-        self.rect = self.image.get_rect(center=(x, y))
+        self.left = self.image
+        self.right = pg.transform.flip(self.image, True, False)
+        self.rect: pg.Rect = self.image.get_rect(center=(x, y))
         self.speed = speed
         self.state = 'idle'
         self.direction = 0 # direction in degrees
@@ -155,15 +176,21 @@ class Enemy(pg.sprite.Sprite):
                 move = move.normalize()
                 x = self.rect.centerx + move.x * 20
                 y = self.rect.centery + move.y * 20
-                Bullet([level.all_sprites, level.bullets], x, y, pos, self.direction, 10, 2)
+                Bullet([level.all_sprites, level.bullets], x, y, pos, self.direction, 10, 2, False)
                 self.shoot_timer.start_timer()
-        self.rect.x += self.speed * math.cos(self.direction) * self.move
+        self.rect.x += round(self.speed * math.cos(self.direction) * self.move)
         if not level.touched(self.rect):
-            self.rect.x -= self.speed * math.cos(self.direction) * self.move
-        self.rect.y += self.speed * math.sin(self.direction) * self.move
+            self.rect.x -= round(self.speed * math.cos(self.direction) * self.move)
+        self.rect.y += round(self.speed * math.sin(self.direction) * self.move)
         if not level.touched(self.rect):
-            self.rect.y -= self.speed * math.sin(self.direction) * self.move
-        if self.health <= 0: self.kill()
+            self.rect.y -= round(self.speed * math.sin(self.direction) * self.move)
+        if self.health <= 0:
+            groups = [level.corspes]
+            Corpse(groups, *self.rect.center, IMAGES['enemy_dead'], level)
+            self.kill()
         if level.debug:
             rect = self.rect.inflate(2, 2)
             pg.draw.rect(main.surface, RED, rect, 1)
+        if math.cos(self.direction) > 0:
+            self.image = self.right
+        else: self.image = self.left
