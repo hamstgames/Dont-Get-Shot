@@ -165,12 +165,10 @@ class Enemy(pg.sprite.Sprite):
         self.move = 1
         self.health = 5
 
-    def update(self, level, main):
-        self.rect.x += level.movex
-        self.rect.y += level.movey
+    def update_movement(self, level, main):
         if self.state == 'idle':
             self.move = 1
-            if random() < 0.01:
+            if random() < 0.1:
                 self.direction = randint(0, 360)
             # do line check if seen player
             player_center = level.player_rect.center
@@ -180,7 +178,7 @@ class Enemy(pg.sprite.Sprite):
             touch_player = False
             for i in range(200):
                 x += linex; y += liney
-                col_rect = pg.Rect(x, y, 1, 1)
+                col_rect = pg.Rect(x-1, y-1, 2, 2)
                 if col_rect.colliderect(level.player_rect):
                     touch_player = True; break
                 if not level.touched(col_rect):
@@ -198,7 +196,7 @@ class Enemy(pg.sprite.Sprite):
             touch_player = False
             for i in range(200):
                 x += linex; y += liney
-                col_rect = pg.Rect(x, y, 1, 1)
+                col_rect = pg.Rect(x-1, y-1, 2, 2)
                 if col_rect.colliderect(level.player_rect):
                     touch_player = True; break
                 if not level.touched(col_rect):
@@ -207,7 +205,7 @@ class Enemy(pg.sprite.Sprite):
                     pg.draw.rect(main.surface, RED, col_rect)
             if not touch_player:
                 self.state = 'idle'
-            if vector.magnitude() < 50:
+            if vector.magnitude() < 100:
                 self.move = 0
             else: self.move = 1
             # set direction to face player
@@ -223,19 +221,23 @@ class Enemy(pg.sprite.Sprite):
                 y = self.rect.centery + move.y * 20
                 Bullet([level.all_sprites, level.bullets], x, y, pos, self.direction, 10, 2)
                 self.shoot_timer.start_timer()
+        if self.health <= 0:
+            groups = [level.corspes]
+            Corpse(groups, *self.rect.center, IMAGES['enemy_dead'], level)
+            self.kill()
+        if math.cos(self.direction) > 0:
+            self.image = self.right
+        else: self.image = self.left
+    
+    def update(self, level, main):
+        self.rect.x += level.movex
+        self.rect.y += level.movey
         self.rect.x += round(self.speed * math.cos(self.direction) * self.move)
         if not level.touched(self.rect):
             self.rect.x -= round(self.speed * math.cos(self.direction) * self.move)
         self.rect.y += round(self.speed * math.sin(self.direction) * self.move)
         if not level.touched(self.rect):
             self.rect.y -= round(self.speed * math.sin(self.direction) * self.move)
-        if self.health <= 0:
-            groups = [level.corspes]
-            Corpse(groups, *self.rect.center, IMAGES['enemy_dead'], level)
-            self.kill()
         if level.debug:
             rect = self.rect.inflate(2, 2)
             pg.draw.rect(main.surface, RED, rect, 1)
-        if math.cos(self.direction) > 0:
-            self.image = self.right
-        else: self.image = self.left

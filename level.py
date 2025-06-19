@@ -32,7 +32,9 @@ class Level:
         Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
         Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
         Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
+        self.tick_timer = PulseTimer(1000 / TPS)
         self.debug = True
+        self.player_knockback = pg.Vector2(0, 0)
 
     def touched(self, rect=None):
         rect = self.player_rect if rect is None else rect
@@ -60,6 +62,18 @@ class Level:
             self.player_rect.y += PLAYERSPEED
             if self.touched(): self.movey = -PLAYERSPEED
             self.player_rect.y -= PLAYERSPEED
+        self.player_rect.x += round(self.player_knockback.x)
+        knock = round(self.player_knockback.x)
+        if self.touched(): self.movex  -= self.player_knockback.x
+        else: self.player_knockback.x = 0
+        self.player_rect.x -= knock
+        self.player_rect.y += round(self.player_knockback.y)
+        knock = round(self.player_knockback.y)
+        if self.touched(): self.movey -= self.player_knockback.y
+        else: self.player_knockback.y = 0
+        self.player_rect.y -= knock
+        self.player_knockback.x *= 0.8
+        self.player_knockback.y *= 0.8
         # if self.change_timer.update():
         #     if keys[pg.K_q]:
         #         self.inventory_index -= 1
@@ -114,12 +128,9 @@ class Level:
                 else: PBullet([self.all_sprites, self.bullets], *rect.center, direction, angle,
                               gundata['bulletspeed'], gundata['damage'], False)
             gundata['sound'].play()
-            self.player_rect.x -= math.cos(math.radians(angle)) * gundata['kickback']
-            if self.touched(): self.movex += math.cos(math.radians(angle)) * gundata['kickback']
-            self.player_rect.x += math.cos(math.radians(angle)) * gundata['kickback']
-            self.player_rect.y -= math.sin(math.radians(angle)) * gundata['kickback']
-            if self.touched(): self.movey += math.sin(math.radians(angle)) * gundata['kickback']
-            self.player_rect.y += math.sin(math.radians(angle)) * gundata['kickback']
+            x = math.cos(math.radians(angle)) * gundata['kickback']
+            y = math.sin(math.radians(angle)) * gundata['kickback']
+            self.player_knockback.x -= x; self.player_knockback.y -= y
             self.shoot_timer.start_timer()
         for event in pg.event.get(pg.MOUSEBUTTONDOWN):
             if event.button == 1 and self.shoot_timer.update() and gundata['once_a_time']:
@@ -133,12 +144,9 @@ class Level:
                     else: PBullet([self.all_sprites, self.bullets], *rect.center, direction, angle,
                                   gundata['bulletspeed'], gundata['damage'], False)
                 gundata['sound'].play()
-                self.player_rect.x -= math.cos(math.radians(angle)) * gundata['kickback']
-                if self.touched(): self.movex += math.cos(math.radians(angle)) * gundata['kickback']
-                self.player_rect.x += math.cos(math.radians(angle)) * gundata['kickback']
-                self.player_rect.y -= math.sin(math.radians(angle)) * gundata['kickback']
-                if self.touched(): self.movey += math.sin(math.radians(angle)) * gundata['kickback']
-                self.player_rect.y += math.sin(math.radians(angle)) * gundata['kickback']
+                x = math.cos(math.radians(angle)) * gundata['kickback']
+                y = math.sin(math.radians(angle)) * gundata['kickback']
+                self.player_knockback.x -= x; self.player_knockback.y -= y
                 self.shoot_timer.start_timer()
         self.corspes.update(self, main)
         self.corspes.draw(main.surface)
@@ -150,6 +158,9 @@ class Level:
         self.bullets.update(self, main)
         self.particles.update(self, main)
         self.enemies.update(self, main)
+        if self.tick_timer.update():
+            for enemy in self.enemies:
+                enemy.update_movement(self, main)
         self.all_sprites.draw(main.surface)
         if self.flip:
             main.surface.blit(self.player_flip, self.player_rect)
