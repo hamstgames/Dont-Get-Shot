@@ -24,13 +24,8 @@ class Level:
         Wall([self.all_sprites, self.walls, self.touchable], 500, -500, 50, 1000)
         self.flip = False
         self.shoot_timer = PressTimer(100)
-        self.inventory = ['submachinegun2','submachinegun1','rifle','shotgun','handgun','revolver', 'rifle2']
+        self.inventory = ['shotgun','grenade_launcher','submachinegun2','submachinegun1','rifle','handgun','revolver', 'rifle2']
         self.inventory_index = 0; self.gunmode = 0
-        Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
-        Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
-        Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
-        Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
-        Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
         Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
         self.tick_timer = PulseTimer(1000 / TPS)
         self.debug = True
@@ -118,22 +113,9 @@ class Level:
         except: direction = pg.Vector2(0, 0)
         rect.x += round(direction.x * 20); rect.y += round(direction.y * 20)
         if pg.mouse.get_pressed()[0] and self.shoot_timer.update() and not gundata['once_a_time']:
-            for _ in range(gundata['quantity']):
-                angle += randint(-gundata['deviation'], gundata['deviation'])
-                direction = pg.Vector2(
-                    math.cos(math.radians(angle)), math.sin(math.radians(angle)))
-                if not gundata['penetrative']:
-                    Bullet([self.all_sprites, self.bullets], *rect.center, direction, angle, 
-                        gundata['bulletspeed'], gundata['damage'], False)
-                else: PBullet([self.all_sprites, self.bullets], *rect.center, direction, angle,
-                              gundata['bulletspeed'], gundata['damage'], False)
-            gundata['sound'].play()
-            x = math.cos(math.radians(angle)) * gundata['kickback']
-            y = math.sin(math.radians(angle)) * gundata['kickback']
-            self.player_knockback.x -= x; self.player_knockback.y -= y
-            self.shoot_timer.start_timer()
-        for event in pg.event.get(pg.MOUSEBUTTONDOWN):
-            if event.button == 1 and self.shoot_timer.update() and gundata['once_a_time']:
+            if gundata.get('bomb', False):
+                self.bomb(gundata, angle, rect)
+            else:
                 for _ in range(gundata['quantity']):
                     angle += randint(-gundata['deviation'], gundata['deviation'])
                     direction = pg.Vector2(
@@ -142,12 +124,31 @@ class Level:
                         Bullet([self.all_sprites, self.bullets], *rect.center, direction, angle, 
                             gundata['bulletspeed'], gundata['damage'], False)
                     else: PBullet([self.all_sprites, self.bullets], *rect.center, direction, angle,
-                                  gundata['bulletspeed'], gundata['damage'], False)
+                                gundata['bulletspeed'], gundata['damage'], False)
                 gundata['sound'].play()
                 x = math.cos(math.radians(angle)) * gundata['kickback']
                 y = math.sin(math.radians(angle)) * gundata['kickback']
                 self.player_knockback.x -= x; self.player_knockback.y -= y
                 self.shoot_timer.start_timer()
+        for event in pg.event.get(pg.MOUSEBUTTONDOWN):
+            if event.button == 1 and self.shoot_timer.update() and gundata['once_a_time']:
+                if gundata.get('bomb', False):
+                    self.bomb(gundata, angle, rect)
+                else:
+                    for _ in range(gundata['quantity']):
+                        angle += randint(-gundata['deviation'], gundata['deviation'])
+                        direction = pg.Vector2(
+                            math.cos(math.radians(angle)), math.sin(math.radians(angle)))
+                        if not gundata['penetrative']:
+                            Bullet([self.all_sprites, self.bullets], *rect.center, direction, angle, 
+                                gundata['bulletspeed'], gundata['damage'], False)
+                        else: PBullet([self.all_sprites, self.bullets], *rect.center, direction, angle,
+                                    gundata['bulletspeed'], gundata['damage'], False)
+                    gundata['sound'].play()
+                    x = math.cos(math.radians(angle)) * gundata['kickback']
+                    y = math.sin(math.radians(angle)) * gundata['kickback']
+                    self.player_knockback.x -= x; self.player_knockback.y -= y
+                    self.shoot_timer.start_timer()
         self.corspes.update(self, main)
         self.corspes.draw(main.surface)
         self.blood.update(self, main)
@@ -176,3 +177,7 @@ class Level:
     def game_over(self, main):
         draw_text('GAME OVER', pg.font.SysFont(None, 100), BLACK, 
                   main.surface, WINSW//2, WINSH//2, 'center')
+    
+    def bomb(self, gundata:dict, angle, rect: pg.Rect):
+        self.shoot_timer.start_timer()
+        Grenade([self.all_sprites, self.bullets], *rect.center, angle, gundata['bulletspeed'])

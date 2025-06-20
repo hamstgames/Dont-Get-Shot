@@ -35,7 +35,7 @@ for image in IMAGESPATH.glob("*.*"):
     IMAGES[image.stem] = pg.image.load(image)
 for sound in SOUNDPATH.glob("*.*"):
     SOUNDS[sound.stem] = pg.mixer.Sound(sound)
-    SOUNDS[sound.stem].set_volume(0.01)
+    SOUNDS[sound.stem].set_volume(0.5)
 
 # Gun pictures from https://enterthegungeon.fandom.com/wiki/Guns
 GUNDATA = {
@@ -47,7 +47,7 @@ GUNDATA = {
         "quantity": 1,
         "sound": SOUNDS["revolver"],
         "damage": 3,
-        "kickback": 1,
+        "kickback": 0,
         "once_a_time": True,
         "penetrative": False
     }, "handgun": {
@@ -57,7 +57,7 @@ GUNDATA = {
         "image": scale1_2(IMAGES["handgun"]),
         "quantity": 1,
         "sound": SOUNDS["handgun"],
-        "damage": 1,
+        "damage": 4,
         "kickback": 1,
         "once_a_time": False,
         "penetrative": True
@@ -68,8 +68,8 @@ GUNDATA = {
         "image": scale1_2(IMAGES["rifle"]),
         "quantity": 1,
         "sound": SOUNDS["rifle"],
-        "damage": 3,
-        "kickback": 1,
+        "damage": 4,
+        "kickback": 0,
         "once_a_time": False,
         "penetrative": False
     }, "shotgun": {
@@ -92,8 +92,8 @@ GUNDATA = {
                 "image": scale1_2(IMAGES["rifle2"]),
                 "quantity": 1,
                 "sound": SOUNDS["rifle2"],
-                "damage": 3,
-                "kickback": 1,
+                "damage": 4,
+                "kickback": 0,
                 "once_a_time": False,
                 "penetrative": False
             }, { # burst
@@ -103,7 +103,7 @@ GUNDATA = {
                 "image": scale1_2(IMAGES["rifle2"]),
                 "quantity": 3,
                 "sound": SOUNDS["handgun"],
-                "damage": 3,
+                "damage": 4,
                 "kickback": 3,
                 "once_a_time": False,
                 "penetrative": False
@@ -117,7 +117,7 @@ GUNDATA = {
         "quantity": 1,
         "sound": SOUNDS["submachinegun"],
         "damage": 2.5,
-        "kickback": 1,
+        "kickback": 0,
         "once_a_time": False,
         "penetrative": False
     }, "submachinegun2": {
@@ -128,8 +128,18 @@ GUNDATA = {
         "quantity": 1,
         "sound": SOUNDS["submachinegun"],
         "damage": 2.5,
-        "kickback": 1,
+        "kickback": 0,
         "once_a_time": False,
+        "penetrative": False
+    }, "grenade_launcher": {
+        "bomb": True,
+        "cooldown": 1,
+        "bulletspeed": 5,
+        "image": scale1_2(IMAGES["grenade_launcher"]),
+        "quantity": 1,
+        "sound": SOUNDS["grenade_launcher"],
+        "kickback": 10,
+        "once_a_time": True,
         "penetrative": False
     }
 }
