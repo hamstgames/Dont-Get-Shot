@@ -67,6 +67,9 @@ class Level:
             self.player_rect.y += PLAYERSPEED
             if self.touched(): self.movey = -PLAYERSPEED
             self.player_rect.y -= PLAYERSPEED
+        vector = pg.Vector2(self.movex, self.movey)
+        if vector: vector.normalize_ip()
+        self.movex = vector.x * PLAYERSPEED; self.movey = vector.y * PLAYERSPEED
         self.player_rect.x += round(self.player_knockback.x)
         knockx = round(self.player_knockback.x)
         if self.touched(): self.movex  -= self.player_knockback.x
