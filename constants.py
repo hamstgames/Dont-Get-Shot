@@ -115,7 +115,7 @@ GUNDATA = {
         "deviation": 5,
         "image": scale1_2(IMAGES["submachinegun"]),
         "quantity": 1,
-        "sound": SOUNDS["submachinegun"],
+        "sound": SOUNDS["submachinegun1"],
         "damage": 2.5,
         "kickback": 0,
         "once_a_time": False,
@@ -126,7 +126,7 @@ GUNDATA = {
         "deviation": 4,
         "image": scale1_2(IMAGES["submachinegun2"]),
         "quantity": 1,
-        "sound": SOUNDS["submachinegun"],
+        "sound": SOUNDS["submachinegun1"],
         "damage": 2.5,
         "kickback": 0,
         "once_a_time": False,
@@ -134,12 +134,23 @@ GUNDATA = {
     }, "grenade_launcher": {
         "bomb": True,
         "cooldown": 1,
-        "bulletspeed": 5,
+        "bulletspeed": 10,
         "image": scale1_2(IMAGES["grenade_launcher"]),
         "quantity": 1,
         "sound": SOUNDS["grenade_launcher"],
         "kickback": 10,
         "once_a_time": True,
+        "penetrative": False
+    }, "submachinegun3": {
+        "cooldown": 0.067,
+        "bulletspeed": 20,
+        "deviation": 10,
+        "image": scale1_2(IMAGES["submachinegun3"]),
+        "quantity": 1,
+        "sound": SOUNDS["submachinegun2"],
+        "damage": 2,
+        "kickback": 0,
+        "once_a_time": False,
         "penetrative": False
     }
 }
