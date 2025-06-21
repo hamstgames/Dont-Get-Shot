@@ -24,7 +24,7 @@ class Level:
         Wall([self.all_sprites, self.walls, self.touchable], 500, -500, 50, 1000)
         self.flip = False
         self.shoot_timer = PressTimer(100)
-        self.inventory = ['revolver','submachinegun3','grenade_launcher','shotgun','submachinegun2','submachinegun1','rifle','handgun','rifle2']
+        self.inventory = ['grenade_launcher','revolver','submachinegun3','shotgun','submachinegun2','submachinegun1','rifle','handgun','rifle2']
         self.inventory_index = 0; self.gunmode = 0
         Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
         Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
@@ -68,29 +68,20 @@ class Level:
             if self.touched(): self.movey = -PLAYERSPEED
             self.player_rect.y -= PLAYERSPEED
         self.player_rect.x += round(self.player_knockback.x)
-        knock = round(self.player_knockback.x)
+        knockx = round(self.player_knockback.x)
         if self.touched(): self.movex  -= self.player_knockback.x
         else: self.player_knockback.x = 0
-        self.player_rect.x -= knock
+        self.player_rect.x -= knockx
         self.player_rect.y += round(self.player_knockback.y)
-        knock = round(self.player_knockback.y)
+        knocky = round(self.player_knockback.y)
         if self.touched(): self.movey -= self.player_knockback.y
         else: self.player_knockback.y = 0
-        self.player_rect.y -= knock
+        self.player_rect.y -= knocky
+        if not self.touched():
+            self.movex += knockx; self.movey += knocky
+            self.player_knockback.x = 0; self.player_knockback.y = 0
         self.player_knockback.x *= 0.8
         self.player_knockback.y *= 0.8
-        # if self.change_timer.update():
-        #     if keys[pg.K_q]:
-        #         self.inventory_index -= 1
-        #         if self.inventory_index < 0:
-        #             self.inventory_index = len(self.inventory) - 1
-        #         self.gunmode = 0
-        #         self.change_timer.start_timer()
-        #     if keys[pg.K_e]:
-        #         self.inventory_index += 1
-        #         self.inventory_index %= len(self.inventory)
-        #         self.gunmode = 0
-        #         self.change_timer.start_timer()
         for event in pg.event.get(pg.KEYDOWN):
             if event.key == pg.K_q:
                 self.inventory_index -= 1
@@ -123,42 +114,10 @@ class Level:
         except: direction = pg.Vector2(0, 0)
         rect.x += round(direction.x * 20); rect.y += round(direction.y * 20)
         if pg.mouse.get_pressed()[0] and self.shoot_timer.update() and not gundata['once_a_time']:
-            if gundata.get('bomb', False):
-                self.bomb(gundata, angle, rect)
-            else:
-                for _ in range(gundata['quantity']):
-                    angle += randint(-gundata['deviation'], gundata['deviation'])
-                    direction = pg.Vector2(
-                        math.cos(math.radians(angle)), math.sin(math.radians(angle)))
-                    if not gundata['penetrative']:
-                        Bullet([self.all_sprites, self.bullets], *rect.center, direction, angle, 
-                            gundata['bulletspeed'], gundata['damage'], False)
-                    else: PBullet([self.all_sprites, self.bullets], *rect.center, direction, angle,
-                                gundata['bulletspeed'], gundata['damage'], False)
-                gundata['sound'].play()
-                x = math.cos(math.radians(angle)) * gundata['kickback']
-                y = math.sin(math.radians(angle)) * gundata['kickback']
-                self.player_knockback.x -= x; self.player_knockback.y -= y
-                self.shoot_timer.start_timer()
+            self.shoot(gundata, angle, rect)
         for event in pg.event.get(pg.MOUSEBUTTONDOWN):
             if event.button == 1 and self.shoot_timer.update() and gundata['once_a_time']:
-                if gundata.get('bomb', False):
-                    self.bomb(gundata, angle, rect)
-                else:
-                    for _ in range(gundata['quantity']):
-                        angle += randint(-gundata['deviation'], gundata['deviation'])
-                        direction = pg.Vector2(
-                            math.cos(math.radians(angle)), math.sin(math.radians(angle)))
-                        if not gundata['penetrative']:
-                            Bullet([self.all_sprites, self.bullets], *rect.center, direction, angle, 
-                                gundata['bulletspeed'], gundata['damage'], False)
-                        else: PBullet([self.all_sprites, self.bullets], *rect.center, direction, angle,
-                                    gundata['bulletspeed'], gundata['damage'], False)
-                    gundata['sound'].play()
-                    x = math.cos(math.radians(angle)) * gundata['kickback']
-                    y = math.sin(math.radians(angle)) * gundata['kickback']
-                    self.player_knockback.x -= x; self.player_knockback.y -= y
-                    self.shoot_timer.start_timer()
+                self.shoot(gundata, angle, rect)
         self.corspes.update(self, main)
         self.corspes.draw(main.surface)
         self.blood.update(self, main)
@@ -195,3 +154,22 @@ class Level:
         x = math.cos(math.radians(angle)) * gundata['kickback']
         y = math.sin(math.radians(angle)) * gundata['kickback']
         self.player_knockback.x -= x; self.player_knockback.y -= y
+    
+    def shoot(self, gundata:dict, angle, rect:pg.Rect):
+        if gundata.get('bomb', False):
+            self.bomb(gundata, angle, rect)
+        else:
+            for _ in range(gundata['quantity']):
+                angle += randint(-gundata['deviation'], gundata['deviation'])
+                direction = pg.Vector2(
+                    math.cos(math.radians(angle)), math.sin(math.radians(angle)))
+                if not gundata['penetrative']:
+                    Bullet([self.all_sprites, self.bullets], *rect.center, direction, angle, 
+                        gundata['bulletspeed'], gundata['damage'], False)
+                else: PBullet([self.all_sprites, self.bullets], *rect.center, direction, angle,
+                            gundata['bulletspeed'], gundata['damage'], False)
+            gundata['sound'].play()
+            x = math.cos(math.radians(angle)) * gundata['kickback']
+            y = math.sin(math.radians(angle)) * gundata['kickback']
+            self.player_knockback.x -= x; self.player_knockback.y -= y
+            self.shoot_timer.start_timer()

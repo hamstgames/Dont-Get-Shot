@@ -1,0 +1,116 @@
+{
+    "revolver": {
+        "cooldown": 0.016,
+        "bulletspeed": 15,
+        "deviation": 6,
+        "image": "revolver",
+        "quantity": 1,
+        "sound": "revolver",
+        "damage": 3,
+        "kickback": 0,
+        "once_a_time": true,
+        "penetrative": false
+    }, "handgun": {
+        "cooldown": 0.2,
+        "bulletspeed": 15,
+        "deviation": 10,
+        "image": "handgun",
+        "quantity": 1,
+        "sound": "handgun",
+        "damage": 4,
+        "kickback": 1,
+        "once_a_time": false,
+        "penetrative": true
+    }, "rifle": {
+        "cooldown": 0.1,
+        "bulletspeed": 20,
+        "deviation": 5,
+        "image": "rifle",
+        "quantity": 1,
+        "sound": "rifle",
+        "damage": 4,
+        "kickback": 0,
+        "once_a_time": false,
+        "penetrative": false
+    }, "shotgun": {
+        "cooldown": 0.6,
+        "bulletspeed": 15,
+        "deviation": 10,
+        "image": "shotgun",
+        "quantity": 6,
+        "sound": "shotgun",
+        "damage": 3,
+        "kickback": 10,
+        "once_a_time": true,
+        "penetrative": false
+    }, "rifle2": {
+        "modes": [
+            {
+                "cooldown": 0.08,
+                "bulletspeed": 20,
+                "deviation": 3,
+                "image": "rifle2",
+                "quantity": 1,
+                "sound": "rifle2",
+                "damage": 4,
+                "kickback": 0,
+                "once_a_time": false,
+                "penetrative": false
+            }, {
+                "cooldown": 0.25,
+                "bulletspeed": 20,
+                "deviation": 3,
+                "image": "rifle2",
+                "quantity": 3,
+                "sound": "handgun",
+                "damage": 4,
+                "kickback": 3,
+                "once_a_time": false,
+                "penetrative": false
+            }
+        ]
+    }, "submachinegun1": {
+        "cooldown": 0.05,
+        "bulletspeed": 20,
+        "deviation": 5,
+        "image": "submachinegun",
+        "quantity": 1,
+        "sound": "submachinegun1",
+        "damage": 2.5,
+        "kickback": 0,
+        "once_a_time": false,
+        "penetrative": false
+    }, "submachinegun2": {
+        "cooldown": 0.067,
+        "bulletspeed": 20,
+        "deviation": 4,
+        "image": "submachinegun2",
+        "quantity": 1,
+        "sound": "submachinegun1",
+        "damage": 2.5,
+        "kickback": 0,
+        "once_a_time": false,
+        "penetrative": false
+    }, "grenade_launcher": {
+        "bomb": true,
+        "cooldown": 1,
+        "bulletspeed": 10,
+        "image": "grenade_launcher",
+        "quantity": 1,
+        "sound": "grenade_launcher",
+        "kickback": 10,
+        "once_a_time": true,
+        "penetrative": false
+    }, "submachinegun3": {
+        "cooldown": 0.067,
+        "bulletspeed": 20,
+        "deviation": 10,
+        "image": "submachinegun3",
+        "quantity": 1,
+        "sound": "submachinegun2",
+        "damage": 2,
+        "kickback": 0,
+        "once_a_time": false,
+        "penetrative": false
+    }
+}

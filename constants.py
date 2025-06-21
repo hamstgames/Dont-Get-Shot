@@ -30,6 +30,7 @@ BASEPATH = Path(__file__).parent
 ASSETSPATH = BASEPATH / "assets"
 IMAGESPATH = ASSETSPATH / "images"
 SOUNDPATH = ASSETSPATH / "sounds"
+DATAPATH = ASSETSPATH / "data"
 
 for image in IMAGESPATH.glob("*.*"):
     IMAGES[image.stem] = pg.image.load(image)
@@ -38,119 +39,14 @@ for sound in SOUNDPATH.glob("*.*"):
     SOUNDS[sound.stem].set_volume(0.5)
 
 # Gun pictures from https://enterthegungeon.fandom.com/wiki/Guns
-GUNDATA = {
-    "revolver": {
-        "cooldown": 0.016,
-        "bulletspeed": 15,
-        "deviation": 6,
-        "image": scale1_2(IMAGES["revolver"]),
-        "quantity": 1,
-        "sound": SOUNDS["revolver"],
-        "damage": 3,
-        "kickback": 0,
-        "once_a_time": True,
-        "penetrative": False
-    }, "handgun": {
-        "cooldown": 0.2,
-        "bulletspeed": 15,
-        "deviation": 10,
-        "image": scale1_2(IMAGES["handgun"]),
-        "quantity": 1,
-        "sound": SOUNDS["handgun"],
-        "damage": 4,
-        "kickback": 1,
-        "once_a_time": False,
-        "penetrative": True
-    }, "rifle": {
-        "cooldown": 0.1,
-        "bulletspeed": 20,
-        "deviation": 5,
-        "image": scale1_2(IMAGES["rifle"]),
-        "quantity": 1,
-        "sound": SOUNDS["rifle"],
-        "damage": 4,
-        "kickback": 0,
-        "once_a_time": False,
-        "penetrative": False
-    }, "shotgun": {
-        "cooldown": 0.6,
-        "bulletspeed": 15,
-        "deviation": 10,
-        "image": scale1_2(IMAGES["shotgun"]),
-        "quantity": 6,
-        "sound": SOUNDS["shotgun"],
-        "damage": 3,
-        "kickback": 10,
-        "once_a_time": True,
-        "penetrative": False
-    }, "rifle2": {
-        "modes": [
-            { # auto
-                "cooldown": 0.08,
-                "bulletspeed": 20,
-                "deviation": 3,
-                "image": scale1_2(IMAGES["rifle2"]),
-                "quantity": 1,
-                "sound": SOUNDS["rifle2"],
-                "damage": 4,
-                "kickback": 0,
-                "once_a_time": False,
-                "penetrative": False
-            }, { # burst
-                "cooldown": 0.25,
-                "bulletspeed": 20,
-                "deviation": 3,
-                "image": scale1_2(IMAGES["rifle2"]),
-                "quantity": 3,
-                "sound": SOUNDS["handgun"],
-                "damage": 4,
-                "kickback": 3,
-                "once_a_time": False,
-                "penetrative": False
-            }
-        ]
-    }, "submachinegun1": {
-        "cooldown": 0.05,
-        "bulletspeed": 20,
-        "deviation": 5,
-        "image": scale1_2(IMAGES["submachinegun"]),
-        "quantity": 1,
-        "sound": SOUNDS["submachinegun1"],
-        "damage": 2.5,
-        "kickback": 0,
-        "once_a_time": False,
-        "penetrative": False
-    }, "submachinegun2": {
-        "cooldown": 0.067,
-        "bulletspeed": 20,
-        "deviation": 4,
-        "image": scale1_2(IMAGES["submachinegun2"]),
-        "quantity": 1,
-        "sound": SOUNDS["submachinegun1"],
-        "damage": 2.5,
-        "kickback": 0,
-        "once_a_time": False,
-        "penetrative": False
-    }, "grenade_launcher": {
-        "bomb": True,
-        "cooldown": 1,
-        "bulletspeed": 10,
-        "image": scale1_2(IMAGES["grenade_launcher"]),
-        "quantity": 1,
-        "sound": SOUNDS["grenade_launcher"],
-        "kickback": 10,
-        "once_a_time": True,
-        "penetrative": False
-    }, "submachinegun3": {
-        "cooldown": 0.067,
-        "bulletspeed": 20,
-        "deviation": 10,
-        "image": scale1_2(IMAGES["submachinegun3"]),
-        "quantity": 1,
-        "sound": SOUNDS["submachinegun2"],
-        "damage": 2,
-        "kickback": 0,
-        "once_a_time": False,
-        "penetrative": False
-    }
-}
+raw_gundata = json_load(open(DATAPATH / "guns.json", encoding='utf-8'))
+GUNDATA: dict[str, dict] = raw_gundata
+for gun, data in GUNDATA.items():
+    if "modes" in data:
+        for mode, mode_data in enumerate(data["modes"]):
+            GUNDATA[gun]["modes"][mode]["image"] = scale1_2(IMAGES[mode_data["image"]])
+            GUNDATA[gun]["modes"][mode]["sound"] = SOUNDS[mode_data["sound"]]
+    else:
+        GUNDATA[gun]["image"] = scale1_2(IMAGES[data["image"]])
+        GUNDATA[gun]["sound"] = SOUNDS[data["sound"]]
+# print(GUNDATA)

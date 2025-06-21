@@ -145,7 +145,7 @@ class Corpse(pg.sprite.Sprite):
         w = surface.get_width(); h = surface.get_height()
         self.image = pg.transform.scale(surface, (w, h // 4 * 3))
         self.rect = self.image.get_rect(center=(x, y))
-        self.timer = PressTimer(100000)
+        self.timer = PressTimer(1000000)
         self.timer.start_timer()
         for _ in range(5):
             Blood(level.blood, *self.rect.center, IMAGES["blood2"], randint(0, 360))
@@ -153,8 +153,10 @@ class Corpse(pg.sprite.Sprite):
     def update(self, level, *_):
         self.rect.x += level.movex
         self.rect.y += level.movey
-        if self.timer.update(): self.kill()
-
+        if self.timer.update():
+            for _ in range(3):
+                Blood([level.blood], *self.rect.center, IMAGES["blood2"], randint(0, 360))
+            self.kill()
 
 class Enemy(pg.sprite.Sprite):
     """A Enemy class to subclass"""
