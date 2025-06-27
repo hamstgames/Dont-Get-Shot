@@ -24,13 +24,8 @@ class Level:
         Wall([self.all_sprites, self.walls, self.touchable], 500, -500, 50, 1000)
         self.flip = False
         self.shoot_timer = PressTimer(100)
-        self.inventory = ['grenade_launcher','revolver','submachinegun3','shotgun','submachinegun2','submachinegun1','rifle','handgun','rifle2']
+        self.inventory = ['rifle3','handgun','grenade_launcher','revolver','submachinegun3','shotgun','submachinegun2','submachinegun1','rifle','rifle2']
         self.inventory_index = 0; self.gunmode = 0
-        Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
-        Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
-        Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
-        Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
-        Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
         Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
         Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
         Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
@@ -152,7 +147,8 @@ class Level:
     
     def bomb(self, gundata:dict, angle, rect: pg.Rect):
         self.shoot_timer.start_timer()
-        Grenade([self.all_sprites, self.bullets], *rect.center, angle, gundata['bulletspeed'])
+        Grenade([self.all_sprites, self.bullets], *rect.center, angle,
+                gundata['bulletspeed'], gundata['damage'])
         gundata['sound'].play()
         x = math.cos(math.radians(angle)) * gundata['kickback']
         y = math.sin(math.radians(angle)) * gundata['kickback']

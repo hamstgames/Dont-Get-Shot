@@ -99,6 +99,7 @@
         "quantity": 1,
         "sound": "grenade_launcher",
         "kickback": 10,
+        "damage": 1,
         "once_a_time": true,
         "penetrative": false
     }, "submachinegun3": {
@@ -110,6 +111,17 @@
         "sound": "submachinegun2",
         "damage": 2,
         "kickback": 0,
+        "once_a_time": false,
+        "penetrative": false
+    }, "rifle3": {
+        "bomb": true,
+        "cooldown": 0.15,
+        "bulletspeed": 10,
+        "image": "rifle3",
+        "quantity": 1,
+        "sound": "grenade_launcher",
+        "kickback": 0,
+        "damage": 0.3,
         "once_a_time": false,
         "penetrative": false
     }

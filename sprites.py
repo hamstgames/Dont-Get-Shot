@@ -35,7 +35,7 @@ class Explosion(pg.sprite.Sprite):
         if pg.time.get_ticks() - self.start > self.time: self.kill()
         for enemy in pg.sprite.spritecollide(self, level.enemies, False): # pyright: ignore[reportArgumentType]
             enemy.health -= self.damage
-            for _ in range(self.damage): 
+            for _ in range(math.ceil(self.damage)): 
                 Blood([level.blood], *self.rect.center, IMAGES["blood2"], randint(0, 360))
         # make circle bigger
         w = self.rect.width + self.speed
