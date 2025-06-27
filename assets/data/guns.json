@@ -135,5 +135,16 @@
         "kickback": 0,
         "once_a_time": false,
         "penetrative": false
+    }, "shotgun2": {
+        "cooldown": 0.6,
+        "bulletspeed": 15,
+        "deviation": 9,
+        "image": "shotgun2",
+        "quantity": 10,
+        "sound": "shotgun2",
+        "damage": 3,
+        "kickback": 10,
+        "once_a_time": true,
+        "penetrative": false
     }
 }

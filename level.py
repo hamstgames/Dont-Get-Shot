@@ -24,7 +24,7 @@ class Level:
         Wall([self.all_sprites, self.walls, self.touchable], 500, -500, 50, 1000)
         self.flip = False
         self.shoot_timer = PressTimer(100)
-        self.inventory = ['submachinegun3','machinegun1','rifle3','handgun','grenade_launcher','revolver','shotgun','submachinegun2','submachinegun1','rifle1','rifle2']
+        self.inventory = ['shotgun2','submachinegun3','machinegun1','rifle3','handgun','grenade_launcher','revolver','shotgun','submachinegun2','submachinegun1','rifle1','rifle2']
         self.inventory_index = 0; self.gunmode = 0
         Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
         Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
