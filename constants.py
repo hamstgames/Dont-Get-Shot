@@ -50,3 +50,5 @@ for gun, data in GUNDATA.items():
         GUNDATA[gun]["image"] = scale1_2(IMAGES[data["image"]])
         GUNDATA[gun]["sound"] = SOUNDS[data["sound"]]
 # print(GUNDATA)
+
+get_blood = lambda: IMAGES[choice(["blood1", "blood2"])]

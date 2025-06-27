@@ -36,7 +36,7 @@ class Explosion(pg.sprite.Sprite):
         for enemy in pg.sprite.spritecollide(self, level.enemies, False): # pyright: ignore[reportArgumentType]
             enemy.health -= self.damage
             for _ in range(math.ceil(self.damage)): 
-                Blood([level.blood], *self.rect.center, IMAGES["blood2"], randint(0, 360))
+                Blood([level.blood], *self.rect.center, get_blood(), randint(0, 360))
         # make circle bigger
         w = self.rect.width + self.speed
         h = self.rect.height + self.speed
@@ -76,7 +76,7 @@ class Bullet(pg.sprite.Sprite):
         for enemy in collisions:
             enemy.health -= self.damage
             for _ in range(3): 
-                Blood([level.blood], *self.rect.center, IMAGES["blood2"], randint(0, 360))
+                Blood([level.blood], *self.rect.center, get_blood(), randint(0, 360))
             Explosion(self.groups(), *self.rect.center, 5, 100)
             self.kill()
         if self.explo.update():
@@ -117,7 +117,7 @@ class PBullet(pg.sprite.Sprite):
                 enemy.health -= self.damage
                 self.last_damaged = enemy
             for _ in range(3): 
-                Blood([level.blood], *self.rect.center, IMAGES["blood2"], randint(0, 360))
+                Blood([level.blood], *self.rect.center, get_blood(), randint(0, 360))
             Explosion(self.groups(), *self.rect.center, 5, 100)
         if self.explo.update():
             Explosion(self.groups(), *self.rect.center, 3, 50, withlevel=False)
@@ -148,14 +148,14 @@ class Corpse(pg.sprite.Sprite):
         self.timer = PressTimer(1000000)
         self.timer.start_timer()
         for _ in range(5):
-            Blood(level.blood, *self.rect.center, IMAGES["blood2"], randint(0, 360))
+            Blood(level.blood, *self.rect.center, get_blood(), randint(0, 360))
 
     def update(self, level, *_):
         self.rect.x += level.movex
         self.rect.y += level.movey
         if self.timer.update():
             for _ in range(3):
-                Blood([level.blood], *self.rect.center, IMAGES["blood2"], randint(0, 360))
+                Blood([level.blood], *self.rect.center, get_blood(), randint(0, 360))
             self.kill()
 
 class Enemy(pg.sprite.Sprite):
