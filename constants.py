@@ -51,4 +51,4 @@ for gun, data in GUNDATA.items():
         GUNDATA[gun]["sound"] = SOUNDS[data["sound"]]
 # print(GUNDATA)
 
-get_blood = lambda: IMAGES[choice(["blood1", "blood2"])]
+get_blood = lambda: IMAGES[choice(["blood1","blood1", "blood2"])]

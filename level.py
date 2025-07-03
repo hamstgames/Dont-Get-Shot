@@ -41,6 +41,7 @@ class Level:
         self.tick_timer = PulseTimer(1000 / TPS)
         self.debug = True
         self.player_knockback = pg.Vector2(0, 0)
+        self.fps_list = []
 
     def touched(self, rect=None):
         rect = self.player_rect if rect is None else rect
@@ -49,36 +50,41 @@ class Level:
         return collisions == -1
 
     def update(self, main):
+        fps = main.clock.get_fps()
+        self.fps_list.append(fps)
+        if len(self.fps_list) > 10: self.fps_list.pop(0)
+        try: fps = round(FPS / fps)
+        except: fps = 0
         main.surface.fill(GRAY)
         keys = pg.key.get_pressed()
         self.movex, self.movey = 0, 0
         if keys[pg.K_a]:
-            self.player_rect.x -= PLAYERSPEED
-            if self.touched(): self.movex = PLAYERSPEED; self.flip = False
-            self.player_rect.x += PLAYERSPEED
+            self.player_rect.x -= PLAYERSPEED * fps
+            if self.touched(): self.movex = PLAYERSPEED * fps; self.flip = False
+            self.player_rect.x += PLAYERSPEED * fps
         if keys[pg.K_d]:
-            self.player_rect.x += PLAYERSPEED
-            if self.touched(): self.movex = -PLAYERSPEED; self.flip = True
-            self.player_rect.x -= PLAYERSPEED
+            self.player_rect.x += PLAYERSPEED * fps
+            if self.touched(): self.movex = -PLAYERSPEED * fps; self.flip = True
+            self.player_rect.x -= PLAYERSPEED * fps
         if keys[pg.K_w]:
-            self.player_rect.y -= PLAYERSPEED
-            if self.touched(): self.movey = PLAYERSPEED
-            self.player_rect.y += PLAYERSPEED
+            self.player_rect.y -= PLAYERSPEED * fps
+            if self.touched(): self.movey = PLAYERSPEED * fps
+            self.player_rect.y += PLAYERSPEED * fps
         if keys[pg.K_s]:
-            self.player_rect.y += PLAYERSPEED
-            if self.touched(): self.movey = -PLAYERSPEED
-            self.player_rect.y -= PLAYERSPEED
+            self.player_rect.y += PLAYERSPEED * fps
+            if self.touched(): self.movey = -PLAYERSPEED * fps
+            self.player_rect.y -= PLAYERSPEED * fps
         vector = pg.Vector2(self.movex, self.movey)
         if vector: vector.normalize_ip()
-        self.movex = vector.x * PLAYERSPEED; self.movey = vector.y * PLAYERSPEED
-        self.player_rect.x += round(self.player_knockback.x)
-        knockx = round(self.player_knockback.x)
-        if self.touched(): self.movex  -= self.player_knockback.x
+        self.movex = vector.x * PLAYERSPEED * fps; self.movey = vector.y * PLAYERSPEED * fps
+        self.player_rect.x += round(self.player_knockback.x * fps)
+        knockx = round(self.player_knockback.x * fps)
+        if self.touched(): self.movex  -= self.player_knockback.x * fps
         else: self.player_knockback.x = 0
         self.player_rect.x -= knockx
-        self.player_rect.y += round(self.player_knockback.y)
-        knocky = round(self.player_knockback.y)
-        if self.touched(): self.movey -= self.player_knockback.y
+        self.player_rect.y += round(self.player_knockback.y * fps)
+        knocky = round(self.player_knockback.y * fps)
+        if self.touched(): self.movey -= self.player_knockback.y * fps
         else: self.player_knockback.y = 0
         self.player_rect.y -= knocky
         if not self.touched():
@@ -129,9 +135,9 @@ class Level:
         main.surface.blit(gun, rect)
         self.shoot_timer.duration = gundata['cooldown'] * 1000
         self.walls.update(self, main)
-        self.bullets.update(self, main)
+        self.bullets.update(self, fps)
         self.particles.update(self, main)
-        self.enemies.update(self, main)
+        self.enemies.update(self, main, fps)
         if self.tick_timer.update():
             for enemy in self.enemies:
                 enemy.update_movement(self, main)
@@ -143,8 +149,11 @@ class Level:
         # draw the health bar
         draw_text(f'Health: {self.player_health}', pg.font.SysFont(None, 17), 
                   BLACK, main.surface, 7, 7, 'left')
+        draw_text(f'FPS: {round(sum(self.fps_list)/len(self.fps_list))}', pg.font.SysFont(None, 17), BLACK,
+                  main.surface, 7, 25, 'left')
         pg.draw.rect(main.surface, BLACK, (8, 18, PLAYERHEALTH*5 + 4, 9))
         pg.draw.rect(main.surface, LIGHTRED, (10, 20, self.player_health*5, 5))
+        print(self.fps_list)
         return self.player_health > 0
     
     def game_over(self, main):
