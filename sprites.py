@@ -60,9 +60,9 @@ class Bullet(pg.sprite.Sprite):
         self.damage = damage
         self.killplayer = killplayer
 
-    def update(self, level, fps):
-        self.rect.x += self.direction[0] * self.speed * fps
-        self.rect.y += self.direction[1] * self.speed * fps
+    def update(self, level):
+        self.rect.x += self.direction[0] * self.speed
+        self.rect.y += self.direction[1] * self.speed
         self.rect.x += level.movex
         self.rect.y += level.movey
         if self.timer.update(): self.kill()
@@ -99,9 +99,9 @@ class PBullet(pg.sprite.Sprite):
         self.killplayer = killplayer
         self.last_damaged = None
 
-    def update(self, level, fps):
-        self.rect.x += self.direction[0] * self.speed * fps
-        self.rect.y += self.direction[1] * self.speed * fps
+    def update(self, level):
+        self.rect.x += self.direction[0] * self.speed
+        self.rect.y += self.direction[1] * self.speed
         self.rect.x += level.movex
         self.rect.y += level.movey
         if self.timer.update(): self.kill()
@@ -238,15 +238,15 @@ class Enemy(pg.sprite.Sprite):
             self.image = self.right
         else: self.image = self.left
     
-    def update(self, level, main, fps):
+    def update(self, level, main):
         self.rect.x += level.movex
         self.rect.y += level.movey
-        self.rect.x += round(self.speed * math.cos(self.direction) * self.move * fps)
+        self.rect.x += round(self.speed * math.cos(self.direction) * self.move)
         if not level.touched(self.rect):
-            self.rect.x -= round(self.speed * math.cos(self.direction) * self.move * fps)
-        self.rect.y += round(self.speed * math.sin(self.direction) * self.move * fps)
+            self.rect.x -= round(self.speed * math.cos(self.direction) * self.move)
+        self.rect.y += round(self.speed * math.sin(self.direction) * self.move)
         if not level.touched(self.rect):
-            self.rect.y -= round(self.speed * math.sin(self.direction) * self.move * fps)
+            self.rect.y -= round(self.speed * math.sin(self.direction) * self.move)
         if level.debug:
             rect = self.rect.inflate(2, 2)
             pg.draw.rect(main.surface, RED, rect, 1)
@@ -267,7 +267,7 @@ class Grenade(pg.sprite.Sprite):
         self.damage = damage
         self.change_timer = PulseTimer(300)
 
-    def update(self, level, main):
+    def update(self, level):
         self.rect.x += level.movex
         self.rect.y += level.movey
         self.rect.x += round(self.movex)

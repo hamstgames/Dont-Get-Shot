@@ -24,7 +24,8 @@ class Level:
         Wall([self.all_sprites, self.walls, self.touchable], 500, -500, 50, 1000)
         self.flip = False
         self.shoot_timer = PressTimer(100)
-        self.inventory = ['shotgun2','submachinegun3','machinegun1','rifle3','handgun','grenade_launcher','revolver','shotgun','submachinegun2','submachinegun1','rifle1','rifle2']
+        self.inventory = ['Budget Revolver','High Caliber Pistol','AK - 47','Regular Shotgun','M(16)op Gun','Kriss SuperV','MP - 5',
+                          'Grenade Launcher','UZI','B - 25','Big & Heavy','Double Barrel','Trash 5Run','Sniper Rifle','Golden Pistol']
         self.inventory_index = 0; self.gunmode = 0
         Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
         Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
@@ -53,38 +54,38 @@ class Level:
         fps = main.clock.get_fps()
         self.fps_list.append(fps)
         if len(self.fps_list) > 10: self.fps_list.pop(0)
-        try: fps = round(FPS / fps)
-        except: fps = 0
+        # try: fps = round(FPS / fps)
+        # except: fps = 0
         main.surface.fill(GRAY)
         keys = pg.key.get_pressed()
         self.movex, self.movey = 0, 0
         if keys[pg.K_a]:
-            self.player_rect.x -= PLAYERSPEED * fps
-            if self.touched(): self.movex = PLAYERSPEED * fps; self.flip = False
-            self.player_rect.x += PLAYERSPEED * fps
+            self.player_rect.x -= PLAYERSPEED
+            if self.touched(): self.movex = PLAYERSPEED; self.flip = False
+            self.player_rect.x += PLAYERSPEED
         if keys[pg.K_d]:
-            self.player_rect.x += PLAYERSPEED * fps
-            if self.touched(): self.movex = -PLAYERSPEED * fps; self.flip = True
-            self.player_rect.x -= PLAYERSPEED * fps
+            self.player_rect.x += PLAYERSPEED
+            if self.touched(): self.movex = -PLAYERSPEED; self.flip = True
+            self.player_rect.x -= PLAYERSPEED
         if keys[pg.K_w]:
-            self.player_rect.y -= PLAYERSPEED * fps
-            if self.touched(): self.movey = PLAYERSPEED * fps
-            self.player_rect.y += PLAYERSPEED * fps
+            self.player_rect.y -= PLAYERSPEED
+            if self.touched(): self.movey = PLAYERSPEED
+            self.player_rect.y += PLAYERSPEED
         if keys[pg.K_s]:
-            self.player_rect.y += PLAYERSPEED * fps
-            if self.touched(): self.movey = -PLAYERSPEED * fps
-            self.player_rect.y -= PLAYERSPEED * fps
+            self.player_rect.y += PLAYERSPEED
+            if self.touched(): self.movey = -PLAYERSPEED
+            self.player_rect.y -= PLAYERSPEED
         vector = pg.Vector2(self.movex, self.movey)
         if vector: vector.normalize_ip()
-        self.movex = vector.x * PLAYERSPEED * fps; self.movey = vector.y * PLAYERSPEED * fps
-        self.player_rect.x += round(self.player_knockback.x * fps)
-        knockx = round(self.player_knockback.x * fps)
-        if self.touched(): self.movex  -= self.player_knockback.x * fps
+        self.movex = vector.x * PLAYERSPEED; self.movey = vector.y * PLAYERSPEED
+        self.player_rect.x += round(self.player_knockback.x)
+        knockx = round(self.player_knockback.x)
+        if self.touched(): self.movex  -= self.player_knockback.x
         else: self.player_knockback.x = 0
         self.player_rect.x -= knockx
-        self.player_rect.y += round(self.player_knockback.y * fps)
-        knocky = round(self.player_knockback.y * fps)
-        if self.touched(): self.movey -= self.player_knockback.y * fps
+        self.player_rect.y += round(self.player_knockback.y)
+        knocky = round(self.player_knockback.y)
+        if self.touched(): self.movey -= self.player_knockback.y
         else: self.player_knockback.y = 0
         self.player_rect.y -= knocky
         if not self.touched():
@@ -132,12 +133,23 @@ class Level:
         self.corspes.draw(main.surface)
         self.blood.update(self, main)
         self.blood.draw(main.surface)
+        if gundata['laser']:
+            pc = self.player_rect.center; x, y = pc
+            vector = pg.Vector2(mouse_pos)-pg.Vector2(pc)
+            linex, liney = vector.normalize()
+            enemies = [sp.rect for sp in self.enemies]
+            for _ in range(500):
+                x += linex; y += liney
+                col_rect = pg.Rect(x, y, 1, 1)
+                if not self.touched(col_rect): break
+                if col_rect.collidelist(enemies)!=-1: break
+                pg.draw.rect(main.surface,GREEN,col_rect)
         main.surface.blit(gun, rect)
         self.shoot_timer.duration = gundata['cooldown'] * 1000
         self.walls.update(self, main)
-        self.bullets.update(self, fps)
+        self.bullets.update(self)
         self.particles.update(self, main)
-        self.enemies.update(self, main, fps)
+        self.enemies.update(self, main)
         if self.tick_timer.update():
             for enemy in self.enemies:
                 enemy.update_movement(self, main)
@@ -153,7 +165,11 @@ class Level:
                   main.surface, 7, 25, 'left')
         pg.draw.rect(main.surface, BLACK, (8, 18, PLAYERHEALTH*5 + 4, 9))
         pg.draw.rect(main.surface, LIGHTRED, (10, 20, self.player_health*5, 5))
-        print(self.fps_list)
+        draw_text(self.inventory[self.inventory_index],pg.font.SysFont(None, 30),
+                  BLACK, main.surface, WINSW//2, 20, 'center')
+        draw_text(gundata['tooltip'],pg.font.SysFont(None, 20),
+                  BLACK, main.surface, WINSW//2, 35, 'center')
+        # print(self.fps_list)
         return self.player_health > 0
     
     def game_over(self, main):

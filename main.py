@@ -15,7 +15,7 @@ class Main:
     def run_game(self):
         alive = True
         while self.running:
-            self.clock.tick()
+            self.clock.tick(FPS)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.running = False

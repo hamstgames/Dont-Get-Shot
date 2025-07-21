@@ -1,5 +1,6 @@
 {
-    "revolver": {
+    "Budget Revolver": {
+        "tooltip": "Your best friend!",
         "cooldown": 0.016,
         "bulletspeed": 15,
         "deviation": 6,
@@ -9,8 +10,10 @@
         "damage": 3,
         "kickback": 0,
         "once_a_time": true,
-        "penetrative": false
-    }, "handgun": {
+        "penetrative": false,
+        "laser": false
+    }, "High Caliber Pistol": {
+        "tooltip": "90mm Caliber",
         "cooldown": 0.2,
         "bulletspeed": 15,
         "deviation": 10,
@@ -20,8 +23,10 @@
         "damage": 4,
         "kickback": 1,
         "once_a_time": false,
-        "penetrative": true
-    }, "rifle1": {
+        "penetrative": true,
+        "laser": false
+    }, "AK - 47": {
+        "tooltip": "Kalashnikov's Glory",
         "cooldown": 0.1,
         "bulletspeed": 20,
         "deviation": 5,
@@ -31,8 +36,10 @@
         "damage": 4,
         "kickback": 0,
         "once_a_time": false,
-        "penetrative": false
-    }, "shotgun": {
+        "penetrative": false,
+        "laser": false
+    }, "Regular Shotgun": {
+        "tooltip": "So 'regular'!",
         "cooldown": 0.6,
         "bulletspeed": 15,
         "deviation": 7,
@@ -42,10 +49,12 @@
         "damage": 3,
         "kickback": 10,
         "once_a_time": true,
-        "penetrative": false
-    }, "rifle2": {
+        "penetrative": false,
+        "laser": false
+    }, "M(16)op Gun": {
         "modes": [
             {
+                "tooltip": "Say hello to my smaller friend!",
                 "cooldown": 0.08,
                 "bulletspeed": 20,
                 "deviation": 3,
@@ -55,8 +64,10 @@
                 "damage": 4,
                 "kickback": 0,
                 "once_a_time": false,
-                "penetrative": false
+                "penetrative": false,
+                "laser": true
             }, {
+                "tooltip": "Say hello to my bigger friend!",
                 "cooldown": 0.25,
                 "bulletspeed": 20,
                 "deviation": 3,
@@ -66,32 +77,38 @@
                 "damage": 4,
                 "kickback": 3,
                 "once_a_time": false,
-                "penetrative": false
+                "penetrative": false,
+                "laser": true
             }
         ]
-    }, "submachinegun1": {
+    }, "Kriss SuperV": {
+        "tooltip": "SSSSSSSSSSSSSSSSSSuperV",
         "cooldown": 0.05,
         "bulletspeed": 20,
         "deviation": 5,
         "image": "submachinegun",
         "quantity": 1,
         "sound": "submachinegun1",
-        "damage": 2.5,
+        "damage": 3,
         "kickback": 0,
         "once_a_time": false,
-        "penetrative": false
-    }, "submachinegun2": {
+        "penetrative": false,
+        "laser": false
+    }, "MP - 5": {
+        "tooltip": "Se our B-25!",
         "cooldown": 0.067,
         "bulletspeed": 20,
         "deviation": 4,
         "image": "submachinegun2",
         "quantity": 1,
         "sound": "submachinegun2",
-        "damage": 2.5,
+        "damage": 3,
         "kickback": 0,
         "once_a_time": false,
-        "penetrative": false
-    }, "grenade_launcher": {
+        "penetrative": false,
+        "laser": false
+    }, "Grenade Launcher": {
+        "tooltip": "Little Big friend!",
         "bomb": true,
         "cooldown": 1,
         "bulletspeed": 10,
@@ -101,8 +118,10 @@
         "kickback": 10,
         "damage": 1,
         "once_a_time": true,
-        "penetrative": false
-    }, "submachinegun3": {
+        "penetrative": false,
+        "laser": false
+    }, "UZI": {
+        "tooltip": "You don't need accuracy!",
         "cooldown": 0.067,
         "bulletspeed": 20,
         "deviation": 10,
@@ -112,8 +131,10 @@
         "damage": 2,
         "kickback": 0,
         "once_a_time": false,
-        "penetrative": false
-    }, "rifle3": {
+        "penetrative": false,
+        "laser": false
+    }, "B - 25": {
+        "tooltip": "Se our MP-5!",
         "bomb": true,
         "cooldown": 0.2,
         "bulletspeed": 10,
@@ -123,10 +144,12 @@
         "kickback": 0,
         "damage": 0.3,
         "once_a_time": false,
-        "penetrative": false
-    }, "machinegun1": {
+        "penetrative": false,
+        "laser": false
+    }, "Big & Heavy": {
+        "tooltip": "Don't let me say it again!",
         "cooldown": 0.1,
-        "bulletspeed": 20,
+        "bulletspeed": 25,
         "deviation": 2,
         "image": "machinegun1",
         "quantity": 1,
@@ -134,8 +157,10 @@
         "damage": 4.5,
         "kickback": 0,
         "once_a_time": false,
-        "penetrative": false
-    }, "shotgun2": {
+        "penetrative": false,
+        "laser": false
+    }, "Double Barrel": {
+        "tooltip": "You need the third barrel!",
         "cooldown": 0.6,
         "bulletspeed": 15,
         "deviation": 9,
@@ -145,6 +170,46 @@
         "damage": 3,
         "kickback": 10,
         "once_a_time": true,
-        "penetrative": false
+        "penetrative": false,
+        "laser": false
+    }, "Trash 5Run": {
+        "tooltip": "Made by number two!",
+        "cooldown": 0.067,
+        "bulletspeed": 12,
+        "deviation": 15,
+        "image": "trashgun",
+        "quantity": 1,
+        "sound": "trashgun",
+        "damage": 0.6,
+        "kickback": -2,
+        "once_a_time": false,
+        "penetrative": false,
+        "laser": false
+    }, "Sniper Rifle": {
+        "tooltip": "Simo Häyhä would be proud!",
+        "cooldown": 1,
+        "bulletspeed": 40,
+        "deviation": 0,
+        "image": "sniperrifle",
+        "quantity": 1,
+        "sound": "sniperrifle",
+        "damage": 50,
+        "kickback": 3,
+        "once_a_time": true,
+        "penetrative": true,
+        "laser": true
+    }, "Golden Pistol": {
+        "tooltip": "Shiny one!",
+        "cooldown": 0.1,
+        "bulletspeed": 20,
+        "deviation": 4,
+        "image": "goldenpistol",
+        "quantity": 1,
+        "sound": "revolver",
+        "damage": 5,
+        "kickback": 0,
+        "once_a_time": false,
+        "penetrative": false,
+        "laser": false
     }
 }
