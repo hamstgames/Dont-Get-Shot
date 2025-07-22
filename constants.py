@@ -5,6 +5,7 @@ pg.mixer.init()
 pg.init()
 
 def scale1_2(image: pg.Surface) -> pg.Surface:
+    """Scale a pygame Surface by 1.2x in both width and height."""
     return scale(image, (image.get_width() * 1.2, image.get_height() * 1.2))
 
 info = pg.display.Info()
@@ -52,3 +53,6 @@ for gun, data in GUNDATA.items():
 # print(GUNDATA)
 
 get_blood = lambda: IMAGES[choice(["blood1","blood1", "blood2"])]
+def get_font(size: int):
+    """Return a pygame system font of the given size."""
+    return pg.font.SysFont(None, size)

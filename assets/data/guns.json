@@ -160,7 +160,7 @@
         "penetrative": false,
         "laser": false
     }, "Double Barrel": {
-        "tooltip": "You need the third barrel!",
+        "tooltip": "You need another barrel!",
         "cooldown": 0.6,
         "bulletspeed": 15,
         "deviation": 9,
