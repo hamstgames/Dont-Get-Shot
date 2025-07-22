@@ -103,7 +103,7 @@ class Level:
             self.player_knockback.x *= 0.8
             self.player_knockback.y *= 0.8
             for event in pg.event.get(pg.KEYDOWN):
-                if event.key == pg.K_e:
+                if event.key == pg.K_i:
                     self.inventory_open = not self.inventory_open
                     continue  # Don't process other controls if toggling inventory
                 if not self.inventory_open:
@@ -222,36 +222,56 @@ class Level:
 
     def handle_inventory_ui(self, main):
         """Draw and handle the inventory UI for gun order adjustment."""
+        if not hasattr(self, "open_surface"):
+            self.open_surface = main.surface.copy()
+        main.surface.blit(self.open_surface, (0, 0))
         # Draw inventory overlay
         overlay = pg.Surface(WINSURFACE, pg.SRCALPHA)
         overlay.fill((0, 0, 0, 180))
         main.surface.blit(overlay, (0, 0))
         font = get_font(32)
-        draw_text("Inventory (E to close, ↑/↓ to move, Enter to select)", font, WHITE, main.surface, WINSW//2, 40, 'center')
+        draw_text("Inventory (I/Esc/right click to close, click to select/swap)", font, WHITE, main.surface, WINSW//2, 40, 'center')
+        mouse_x, mouse_y = pg.mouse.get_pos()
+        mouse_x = int(mouse_x) // WINTIMES
+        mouse_y = int(mouse_y) // WINTIMES
+        # Determine which gun is hovered
+        hovered = None
+        for idx in range(len(self.inventory)):
+            rect_y = 80 + idx * 32
+            rect_h = font.get_height()
+            rect = pg.Rect(WINSW//2-150, rect_y - rect_h//2, 300, rect_h)
+            if rect.collidepoint(mouse_x, mouse_y):
+                hovered = idx
+        # Draw inventory list
         for idx, gun in enumerate(self.inventory):
-            color = YELLOW if idx == self.inventory_selected else WHITE
+            color = YELLOW if idx == hovered else WHITE
             draw_text(f"{idx+1}. {gun}", font, color, main.surface, WINSW//2, 80 + idx*32, 'center')
-        # Handle input for inventory navigation
+        # Handle mouse and keyboard input
         for event in pg.event.get():
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_UP:
-                    self.inventory_selected = (self.inventory_selected - 1) % len(self.inventory)
-                elif event.key == pg.K_DOWN:
-                    self.inventory_selected = (self.inventory_selected + 1) % len(self.inventory)
-                elif event.key == pg.K_RETURN:
-                    # Mark for swapping
+                if event.key == pg.K_ESCAPE or event.key == pg.K_i:
+                    self.inventory_open = False
+                    if hasattr(self, "_swap_index"):
+                        del self._swap_index
+                    if hasattr(self, "open_surface"):
+                        del self.open_surface
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                if event.button == 1 and hovered is not None:
+                    # Left click: select/swap
                     if not hasattr(self, "_swap_index"):
-                        self._swap_index = self.inventory_selected
+                        self._swap_index = hovered
                     else:
-                        # Swap guns
-                        i, j = self._swap_index, self.inventory_selected
+                        i, j = self._swap_index, hovered
                         self.inventory[i], self.inventory[j] = self.inventory[j], self.inventory[i]
                         del self._swap_index
-                elif event.key == pg.K_ESCAPE or event.key == pg.K_e:
+                elif event.button == 3:
+                    # Right click: close inventory
                     self.inventory_open = False
                     if hasattr(self, "_swap_index"):
                         del self._swap_index
         # Show swap selection
         if hasattr(self, "_swap_index"):
             idx = self._swap_index
-            pg.draw.rect(main.surface, RED, (WINSW//2-150, 80+idx*32-4, 300, 32), 2)
+            rect_y = 80 + idx * 32
+            rect_h = font.get_height()
+            pg.draw.rect(main.surface, RED, (WINSW//2-150, rect_y - rect_h//2, 300, rect_h), 2)
