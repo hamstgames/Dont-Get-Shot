@@ -5,14 +5,14 @@ pg.init()
 pg.mixer.init()
 
 class Main:
-    def __init__(self):
+    def __init__(self) -> None:
         self.running = True
         self.clock = pg.time.Clock()
         self.screen = pg.display.set_mode(WINSIZE)
         self.surface = pg.Surface(WINSURFACE)
         self.level = Level()
     
-    def run_game(self):
+    def run_game(self) -> None:
         alive = True
         while self.running:
             self.clock.tick(FPS)

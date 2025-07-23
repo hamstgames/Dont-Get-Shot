@@ -53,6 +53,6 @@ for gun, data in GUNDATA.items():
 # print(GUNDATA)
 
 get_blood = lambda: IMAGES[choice(["blood1","blood1", "blood2"])]
-def get_font(size: int):
+def get_font(size: int) -> pg.font.Font:
     """Return a pygame system font of the given size."""
     return pg.font.SysFont(None, size)

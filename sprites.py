@@ -1,9 +1,10 @@
 import pygame as pg
 from constants import *
+from typing import Any, Iterable, Union
 
 class Wall(pg.sprite.Sprite):
     """A static wall object that blocks movement."""
-    def __init__(self, groups, x, y, width, height):
+    def __init__(self, groups, x: int, y: int, width: int, height: int) -> None:
         """Create a wall at (x, y) with given width and height."""
         super().__init__(groups)
         self.image = pg.Surface((width, height))
@@ -13,14 +14,14 @@ class Wall(pg.sprite.Sprite):
         pg.draw.rect(self.image, BLACK, self.rect, 2, 5)
         self.rect.topleft = (x, y)
     
-    def update(self, level, *_):
+    def update(self, level: Any, *_: Any) -> None:
         """Move wall according to level movement."""
         self.rect.x += level.movex
         self.rect.y += level.movey
 
 class Explosion(pg.sprite.Sprite):
     """An expanding explosion effect that damages enemies."""
-    def __init__(self, groups, x, y, radius, time, damage=0, withlevel=True, speed=1):
+    def __init__(self, groups, x: int, y: int, radius: int, time: int, damage: float = 0, withlevel: bool = True, speed: int = 1) -> None:
         """Create an explosion at (x, y) with given radius and duration."""
         super().__init__(groups) # print(radius)
         self.image = pg.Surface((radius*2, radius*2)).convert_alpha()
@@ -33,7 +34,7 @@ class Explosion(pg.sprite.Sprite):
         self.damage = damage
         self.speed = speed
 
-    def update(self, level, *_):
+    def update(self, level: Any, *_: Any) -> None:
         """Update explosion size and apply damage."""
         if self.withlevel:
             self.rect.x += level.movex
@@ -41,7 +42,7 @@ class Explosion(pg.sprite.Sprite):
         if pg.time.get_ticks() - self.start > self.time: self.kill()
         for enemy in pg.sprite.spritecollide(self, level.enemies, False): # pyright: ignore[reportArgumentType]
             enemy.health -= self.damage
-            for _ in range(math.ceil(self.damage)): 
+            for __ in range(math.ceil(self.damage)): 
                 Blood([level.blood], *self.rect.center, get_blood(), randint(0, 360))
         # make circle bigger
         w = self.rect.width + self.speed
@@ -53,7 +54,7 @@ class Explosion(pg.sprite.Sprite):
 
 class Bullet(pg.sprite.Sprite):
     """A bullet projectile that damages enemies or player."""
-    def __init__(self, groups, x, y, direction, angle, speed, damage, killplayer=True):
+    def __init__(self, groups, x: int, y: int, direction: pg.Vector2, angle: float, speed: float, damage: float, killplayer: bool = True) -> None:
         """Create a bullet at (x, y) moving in direction."""
         super().__init__(groups)
         self.image = IMAGES["bullet"]
@@ -68,10 +69,10 @@ class Bullet(pg.sprite.Sprite):
         self.damage = damage
         self.killplayer = killplayer
 
-    def update(self, level):
+    def update(self, level: Any) -> None:
         """Move bullet and handle collisions."""
-        self.rect.x += self.direction[0] * self.speed
-        self.rect.y += self.direction[1] * self.speed
+        self.rect.x += round(self.direction[0] * self.speed)
+        self.rect.y += round(self.direction[1] * self.speed)
         self.rect.x += level.movex
         self.rect.y += level.movey
         if self.timer.update(): self.kill()
@@ -94,7 +95,7 @@ class Bullet(pg.sprite.Sprite):
 
 class PBullet(pg.sprite.Sprite):
     """A penetrative bullet that can hit multiple enemies."""
-    def __init__(self, groups, x, y, direction, angle, speed, damage, killplayer=True):
+    def __init__(self, groups, x: int, y: int, direction: pg.Vector2, angle: float, speed: float, damage: float, killplayer: bool = True) -> None:
         """Create a penetrative bullet at (x, y)."""
         super().__init__(groups)
         self.image = IMAGES["bullet"]
@@ -110,10 +111,10 @@ class PBullet(pg.sprite.Sprite):
         self.killplayer = killplayer
         self.last_damaged = None
 
-    def update(self, level):
+    def update(self, level: Any) -> None:
         """Move bullet and handle collisions, allowing penetration."""
-        self.rect.x += self.direction[0] * self.speed
-        self.rect.y += self.direction[1] * self.speed
+        self.rect.x += round(self.direction[0] * self.speed)
+        self.rect.y += round(self.direction[1] * self.speed)
         self.rect.x += level.movex
         self.rect.y += level.movey
         if self.timer.update(): self.kill()
@@ -137,7 +138,7 @@ class PBullet(pg.sprite.Sprite):
 
 class Blood(pg.sprite.Sprite):
     """A blood splatter effect."""
-    def __init__(self, groups, x, y, surface, angle):
+    def __init__(self, groups, x: int, y: int, surface: pg.Surface, angle: float) -> None:
         """Create a blood splatter at (x, y) with given surface and angle."""
         super().__init__(groups)
         surface = pg.transform.rotate(surface, angle)
@@ -149,14 +150,14 @@ class Blood(pg.sprite.Sprite):
         self.rect.x += round(math.cos(angle * math.pi / 180) * randint(10, 30))
         self.rect.y += round(math.sin(angle * math.pi / 180) * randint(10, 30))
     
-    def update(self, level, *_):
+    def update(self, level: Any, *_: Any) -> None:
         """Move blood splatter according to level movement."""
         self.rect.x += level.movex
         self.rect.y += level.movey
 
 class Corpse(pg.sprite.Sprite):
     """A corpse left behind by dead enemies."""
-    def __init__(self, groups, x, y, surface, level):
+    def __init__(self, groups, x: int, y: int, surface: pg.Surface, level: Any) -> None:
         """Create a corpse at (x, y) with given surface."""
         super().__init__(groups)
         w = surface.get_width(); h = surface.get_height()
@@ -167,18 +168,18 @@ class Corpse(pg.sprite.Sprite):
         for _ in range(5):
             Blood(level.blood, *self.rect.center, get_blood(), randint(0, 360))
 
-    def update(self, level, *_):
+    def update(self, level: Any, *_: Any) -> None:
         """Update corpse and spawn blood after a delay."""
         self.rect.x += level.movex
         self.rect.y += level.movey
         if self.timer.update():
-            for _ in range(3):
+            for __ in range(3):
                 Blood([level.blood], *self.rect.center, get_blood(), randint(0, 360))
             self.kill()
 
 class Enemy(pg.sprite.Sprite):
     """Enemy character with basic AI and shooting."""
-    def __init__(self, groups, x, y, image, speed=0):
+    def __init__(self, groups, x: int, y: int, image: pg.Surface, speed: float = 0) -> None:
         """Create an enemy at (x, y) with given image and speed."""
         super().__init__(groups)
         self.image = image
@@ -193,7 +194,7 @@ class Enemy(pg.sprite.Sprite):
         self.move = 1
         self.health = 5
 
-    def update_movement(self, level, main):
+    def update_movement(self, level: Any, main: Any) -> None:
         """Update enemy movement and AI state."""
         if self.state == 'idle':
             self.move = 1
@@ -242,12 +243,13 @@ class Enemy(pg.sprite.Sprite):
             self.direction = math.degrees(math.acos(vector[0] / long))
             if vector[1] < 0: self.direction = 360 - self.direction
             if self.shoot_timer.update():
-                pos = [math.cos(math.radians(self.direction)), math.sin(math.radians(self.direction))]
+                pos = pg.Vector2(math.cos(math.radians(self.direction)), 
+                                 math.sin(math.radians(self.direction)))
                 # make pos move twards to player so the enemy doesn't shoot himself
                 move = pg.Vector2(level.player_rect.center)-pg.Vector2(self.rect.center)
                 move = move.normalize()
-                x = self.rect.centerx + move.x * 20
-                y = self.rect.centery + move.y * 20
+                x = round(self.rect.centerx + move.x * 20)
+                y = round(self.rect.centery + move.y * 20)
                 Bullet([level.all_sprites, level.bullets], x, y, pos, self.direction, 10, 2)
                 self.shoot_timer.start_timer()
         if self.health <= 0:
@@ -258,7 +260,7 @@ class Enemy(pg.sprite.Sprite):
             self.image = self.right
         else: self.image = self.left
     
-    def update(self, level, main):
+    def update(self, level: Any, main: Any) -> None:
         """Move enemy and handle collisions."""
         self.rect.x += level.movex
         self.rect.y += level.movey
@@ -274,7 +276,7 @@ class Enemy(pg.sprite.Sprite):
 
 class Grenade(pg.sprite.Sprite):
     """A grenade projectile that explodes after a delay or on impact."""
-    def __init__(self, groups, x, y, direction, speed, damage=1):
+    def __init__(self, groups, x: int, y: int, direction: float, speed: float, damage: float = 1) -> None:
         """Create a grenade at (x, y) moving in direction."""
         super().__init__(*groups)
         images = [IMAGES['burning1'], IMAGES['burning2'], IMAGES['burning3']]
@@ -290,7 +292,7 @@ class Grenade(pg.sprite.Sprite):
         self.damage = damage
         self.change_timer = PulseTimer(300)
 
-    def update(self, level):
+    def update(self, level: Any) -> None:
         """Move grenade and check for explosion triggers."""
         self.rect.x += level.movex
         self.rect.y += level.movey
@@ -308,7 +310,7 @@ class Grenade(pg.sprite.Sprite):
         if self.timer.update():
             self.explode()
 
-    def explode(self):
+    def explode(self) -> None:
         """Trigger grenade explosion effect."""
         pos = self.rect.center
         Explosion(self.groups(), *pos, 10, 100, self.damage, speed=20)

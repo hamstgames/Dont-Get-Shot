@@ -4,7 +4,7 @@ from sprites import *
 
 class Level:
     """Main game level logic, including player, enemies, inventory, and update loop."""
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the level, player, enemies, and inventory."""
         self.player_image = IMAGES['player']
         self.player_flip = pg.transform.flip(self.player_image, True, False)
@@ -48,14 +48,14 @@ class Level:
         self.inventory_open = False
         self.inventory_selected = 0
 
-    def touched(self, rect=None):
+    def touched(self, rect: Optional[pg.Rect] = None) -> bool:
         """Check if the given rect collides with any touchable object."""
         rect = self.player_rect if rect is None else rect
         collist = list(self.touchable)
         collisions = rect.collidelist(collist)
         return collisions == -1
 
-    def update(self, main):
+    def update(self, main: Any) -> bool:
         """Update the game state or show inventory if open."""
         if self.inventory_open:
             self.handle_inventory_ui(main)
@@ -185,12 +185,12 @@ class Level:
             # print(self.fps_list)
         return self.player_health > 0
     
-    def game_over(self, main):
+    def game_over(self, main: Any) -> None:
         """Display the game over screen."""
         draw_text('GAME OVER', pg.font.SysFont(None, 100), BLACK, 
                   main.surface, WINSW//2, WINSH//2, 'center')
     
-    def bomb(self, gundata:dict, angle, rect: pg.Rect):
+    def bomb(self, gundata: dict, angle: float, rect: pg.Rect) -> None:
         """Fire a grenade-type weapon and apply knockback."""
         self.shoot_timer.start_timer()
         Grenade([self.all_sprites, self.bullets], *rect.center, angle,
@@ -200,7 +200,7 @@ class Level:
         y = math.sin(math.radians(angle)) * gundata['kickback']
         self.player_knockback.x -= x; self.player_knockback.y -= y
     
-    def shoot(self, gundata:dict, angle, rect:pg.Rect):
+    def shoot(self, gundata: dict, angle: float, rect: pg.Rect) -> None:
         """Shoot a bullet or grenade based on gun data."""
         if gundata.get('bomb', False):
             self.bomb(gundata, angle, rect)
@@ -220,7 +220,7 @@ class Level:
             self.player_knockback.x -= x; self.player_knockback.y -= y
             self.shoot_timer.start_timer()
 
-    def handle_inventory_ui(self, main):
+    def handle_inventory_ui(self, main: Any) -> None:
         """Draw and handle the inventory UI for gun order adjustment."""
         if not hasattr(self, "open_surface"):
             self.open_surface = main.surface.copy()
