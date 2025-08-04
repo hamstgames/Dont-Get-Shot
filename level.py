@@ -4,7 +4,7 @@ from sprites import *
 
 class Level:
     """Main game level logic, including player, enemies, inventory, and update loop."""
-    def __init__(self) -> None:
+    def __init__(self, username: Union[None,str]="Player", multiplayer=False, mphandler=None) -> None:
         """Initialize the level, player, enemies, and inventory."""
         self.player_image = IMAGES['player']
         self.player_flip = pg.transform.flip(self.player_image, True, False)
@@ -26,8 +26,9 @@ class Level:
         Wall([self.all_sprites, self.walls, self.touchable], 500, -500, 50, 1000)
         self.flip = False
         self.shoot_timer = PressTimer(100)
-        self.inventory = ['Budget Revolver','High Caliber Pistol','AK - 47','Regular Shotgun','M(16)op Gun','Kriss SuperV','MP - 5',
-                          'Grenade Launcher','UZI','B - 25','Big & Heavy','Double Barrel','Trash 5Run','Sniper Rifle','Golden Pistol']
+        self.inventory = ['Budget Revolver','High Caliber Pistol','AK - 47','Regular Shotgun',
+                          'M(16)op Gun','Kriss SuperV','MP - 5','Grenade Launcher','UZI','B - 25',
+                          'Big & Heavy','Double Barrel','Trash 5Run','Sniper Rifle','Golden Pistol']
         self.inventory_index = 0; self.gunmode = 0
         Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
         Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
@@ -47,6 +48,9 @@ class Level:
         self.fps_list = []
         self.inventory_open = False
         self.inventory_selected = 0
+        self.username = username
+        self.multiplayer = multiplayer
+        self.mphandler = mphandler
 
     def touched(self, rect: Optional[pg.Rect] = None) -> bool:
         """Check if the given rect collides with any touchable object."""
@@ -182,7 +186,18 @@ class Level:
                       BLACK, main.surface, WINSW//2, 20, 'center')
             draw_text(gundata['tooltip'], get_font(20), BLACK, 
                       main.surface, WINSW//2, 35, 'center')
-            # print(self.fps_list)
+            if self.multiplayer and self.mphandler:
+                # Update own position and broadcast/send to server
+                self.mphandler.update_player(self.username, self.player_rect.center)
+                # Draw other players
+                for uname, pos in self.mphandler.get_players().items():
+                    if uname == self.username or pos is None:
+                        continue
+                    # Draw other player as a colored circle
+                    pg.draw.circle(main.surface, BLUE, pos, 25)
+                    draw_text(uname, get_font(18), BLACK, main.surface, pos[0], pos[1]-30, 'center')
+                # Draw own username above player sprite
+                draw_text(self.username, get_font(18), BLACK, main.surface, self.player_rect.centerx, self.player_rect.centery-30, 'center')
         return self.player_health > 0
     
     def game_over(self, main: Any) -> None:
