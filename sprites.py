@@ -250,7 +250,7 @@ class Enemy(pg.sprite.Sprite):
                 move = move.normalize()
                 x = round(self.rect.centerx + move.x * 20)
                 y = round(self.rect.centery + move.y * 20)
-                Bullet([level.all_sprites, level.bullets], x, y, pos, self.direction, 10, 2)
+                Bullet([level.all_sprites, level.bullets], x, y, pos, self.direction, 10, 0)
                 self.shoot_timer.start_timer()
         if self.health <= 0:
             groups = [level.corspes]

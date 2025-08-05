@@ -8,6 +8,13 @@ def scale1_2(image: pg.Surface) -> pg.Surface:
     """Scale a pygame Surface by 1.2x in both width and height."""
     return scale(image, (image.get_width() * 1.2, image.get_height() * 1.2))
 
+def rect_to_jsonable(rect: pg.Rect) -> dict:
+    """Convert a pygame Rect to a JSON-serializable dictionary."""
+    return {'x': rect.x, 'y': rect.y, 'width': rect.width, 'height': rect.height}
+def jsonable_to_rect(data: dict) -> pg.Rect:
+    """Convert a JSON-serializable dictionary to a pygame Rect."""
+    return pg.Rect(data['x'], data['y'], data['width'], data['height'])
+
 info = pg.display.Info()
 WINW = info.current_w
 WINH = info.current_h

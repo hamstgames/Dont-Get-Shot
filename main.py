@@ -11,7 +11,6 @@ class Main:
         self.clock = pg.time.Clock()
         self.screen = pg.display.set_mode(WINSIZE)
         self.surface = pg.Surface(WINSURFACE)
-        self.level = Level()
         self.multiplayer = False
         self.username = None
         self.mphandler = None
@@ -24,11 +23,15 @@ class Main:
         mode = simpledialog.askstring("Mode", "Enter 'single', 'server', or 'client':")
         if mode == "server" or mode == "client":
             self.multiplayer = True
-            self.username = simpledialog.askstring("Username", "Enter your username:")
-            ip = simpledialog.askstring("IP", "Enter server IP (for server, use 0.0.0.0):")
+            # self.username = simpledialog.askstring("Username", "Enter your username:")
+            # ip = simpledialog.askstring("IP", "Enter server IP (for server, use 0.0.0.0):")
+            if mode == "client": self.username = 'client'
+            else: self.username = 'server'
+            ip = '127.0.0.1'
             is_server = (mode == "server")
             self.mphandler = MultiplayerHandler(self.username, is_server, ip)
             self.mphandler.add_player(self.username, PLAYERPOS)
+            print("aaa")
         else:
             self.multiplayer = False
             self.username = "Player"
