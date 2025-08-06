@@ -15,6 +15,29 @@ def jsonable_to_rect(data: dict) -> pg.Rect:
     """Convert a JSON-serializable dictionary to a pygame Rect."""
     return pg.Rect(data['x'], data['y'], data['width'], data['height'])
 
+rect_like = Union[pg.Rect, Iterable[int]]
+def wpos_by_spos_r(target_pos: pg.Rect, player_pos: pg.Rect) -> list[int]:
+    tpx, tpy = target_pos.topleft; ppx, ppy = player_pos.topleft
+    return [
+        ppx + tpx - PLAYERPOS[0],
+        ppy + tpy - PLAYERPOS[1]
+    ]
+def wpos_by_spos_i(target_pos: pg.Rect, player_pos: Iterable[int]) -> list[int]:
+    tpx, tpy = target_pos.topleft; ppx, ppy = player_pos
+    return [
+        ppx + tpx - PLAYERPOS[0],
+        ppy + tpy - PLAYERPOS[1]
+    ]
+def wpos_by_spos_all(target_pos_list: Iterable[pg.sprite.Sprite],
+                     player_pos: rect_like) -> list[list[int]]:
+    lst = []
+    if isinstance(player_pos, pg.Rect): fun = wpos_by_spos_r
+    if isinstance(player_pos, Iterable): fun = wpos_by_spos_i
+    else: raise TypeError("player_pos must be a pg.Rect or an Iterable of ints")
+    for target_pos in target_pos_list:
+        lst.append(fun(target_pos.rect, player_pos)) # pyright: ignore[reportAttributeAccessIssue]
+    return lst
+
 info = pg.display.Info()
 WINW = info.current_w
 WINH = info.current_h
@@ -22,6 +45,7 @@ WINH = info.current_h
 WINSIZE = (WINW, WINH)
 WINSW = WINW // 2; WINSH = WINH // 2
 WINSURFACE = (WINSW, WINSH)
+print(f"Window surface size: {WINSW}x{WINSH}")
 WINTIMES = WINW / WINSW
 
 FPS = 60

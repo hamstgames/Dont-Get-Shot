@@ -54,7 +54,14 @@ class MultiplayerHandler:
                     if 'shoot' in msg:
                         with self.lock:
                             self.last_shot = (uname, msg['shoot'])
-
+                    # Process bullets from clients
+                    if 'bullets' in msg:
+                        with self.lock:
+                            self.bullets = [jsonable_to_rect(b) for b in msg['bullets']]
+                    # Process enemies from clients
+                    if 'enemies' in msg:
+                        with self.lock:
+                            self.enemies = [jsonable_to_rect(e) for e in msg['enemies']]
                 else:
                     # Client receives game state from server
                     if 'players' in msg:
@@ -62,7 +69,17 @@ class MultiplayerHandler:
                             self.players = {uname: tuple(pos) for uname, pos in msg['players'].items()}
                             self.bullets = [jsonable_to_rect(b) for b in msg.get('bullets', [])]
                             self.enemies = [jsonable_to_rect(e) for e in msg.get('enemies', [])]
-                time.sleep(0.05)
+                    # Send own position to server
+                    if self.players and self.username in self.players:
+                        pos_msg = {
+                            'username': self.username,
+                            'pos': list(self.players[self.username])
+                        }
+                        try:
+                            self.sock.sendto(json.dumps(pos_msg).encode(), (self.ip, self.port))
+                        except:
+                            pass
+                # print("Received data:", msg)
             except socket.timeout:
                 # Reduce timeout spam in console
                 continue
@@ -81,8 +98,8 @@ class MultiplayerHandler:
                 # Prepare game state
                 state = {
                     'players': self.players.copy(),
-                    'bullets': [rect_to_jsonable(b) for b in self.bullets],
-                    'enemies': [rect_to_jsonable(e) for e in self.enemies]
+                    'bullets': self.enemies.copy(),
+                    'enemies': self.enemies.copy()
                 }
                 data = json.dumps(state).encode()
                 
@@ -96,7 +113,7 @@ class MultiplayerHandler:
 
     def add_player(self, username, pos):
         with self.lock:
-            print("Lock acquired in add_player")
+            # print("Lock acquired in add_player")
             self.players[username] = pos
 
     def remove_player(self, username):

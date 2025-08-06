@@ -1,7 +1,7 @@
 import pygame as pg
+import json
 from constants import *
 from sprites import *
-from multiplayerhandler import MultiplayerHandler
 
 class Level:
     """Main game level logic, including player, enemies, inventory, and update loop."""
@@ -185,11 +185,25 @@ class Level:
                 self.mphandler.update_player(self.username, self.player_world_pos)
                 if self.mphandler.is_server:
                     # Server: update all players, bullets, enemies
-                    # TODO: update bullets/enemies here, e.g.:
-                    self.mphandler.bullets = [b.rect.copy() for b in self.bullets]
-                    # self.mphandler.bullets = [ ... update all bullets ... ]
-                    self.mphandler.enemies = [e.rect.copy() for e in self.enemies]
-                    # self.mphandler.enemies = [ ... update all enemies ... ]
+                    bullets_data = wpos_by_spos_all(self.bullets,self.player_world_pos)
+                    self.mphandler.bullets = bullets_data
+                    enemies_data = wpos_by_spos_all(self.enemies,self.player_world_pos)
+                    self.mphandler.enemies = enemies_data
+                    
+                    # Send updated game state to all clients
+                    state_msg = {
+                        'players': self.mphandler.players.copy(),
+                        'bullets': bullets_data,
+                        'enemies': enemies_data
+                    }
+                    msg = json.dumps(state_msg).encode()
+                    
+                    # Send to all connected clients
+                    for addr in self.mphandler.client_addresses.values():
+                        try:
+                            self.mphandler.sock.sendto(msg, addr)
+                        except:
+                            continue
                     
                     if self.mphandler.last_shot:
                         uname, shoot_data = self.mphandler.last_shot
@@ -199,52 +213,52 @@ class Level:
 
                     # Draw all players except self
                     for uname, pos in self.mphandler.get_players().items():
-                        print('drawing player:', uname, pos)
                         if uname == self.username or pos is None: continue
                         adj_pos = self.adjust_pos(pos)
-                        pg.draw.circle(main.surface, BLUE, pos, 25)
-                        draw_text(uname, get_font(18), BLACK, main.surface, pos[0], pos[1]-30, 'center')
+                        pg.draw.circle(main.surface, BLUE, adj_pos, 25)
+                        draw_text(uname, get_font(18), BLACK, main.surface, adj_pos[0], adj_pos[1]-30, 'center')
                     # Draw all bullets
                     for b in self.mphandler.get_bullets():
-                        adj_pos = self.adjust_pos((b.x, b.y))
+                        adj_pos = self.adjust_pos((b[0], b[1]))
                         pg.draw.circle(main.surface, RED, adj_pos, 5)
                     # Draw all enemies
                     for e in self.mphandler.get_enemies():
-                        adj_pos = self.adjust_pos((e.x, e.y))
+                        adj_pos = self.adjust_pos((e[0], e[1]))
                         pg.draw.rect(main.surface, GREEN, (adj_pos[0]-15, adj_pos[1]-15, 30, 30))
                 else:
                     # Client: update own player, send position and shoot requests
                     # If shooting, send shoot request
-                    if pg.mouse.get_pressed()[0] and self.shoot_timer.update():
-                        shoot_data = {
-                            'angle': angle,
-                            'rect': list(rect.center),
-                            'gun': self.inventory[self.inventory_index]
-                        }
-                        self.mphandler.send_shoot(self.username, shoot_data)
-                        self.shoot_timer.start_timer()
+                    # if pg.mouse.get_pressed()[0] and self.shoot_timer.update():
+                    #     shoot_data = {
+                    #         'angle': angle,
+                    #         'rect': list(rect.center),
+                    #         'gun': self.inventory[self.inventory_index]
+                    #     }
+                    #     self.mphandler.send_shoot(self.username, shoot_data)
+                    #     self.shoot_timer.start_timer()
                     # Draw other players
                     for uname, pos in self.mphandler.get_players().items():
                         if uname == self.username or pos is None: continue
                         adj_pos = self.adjust_pos(pos)
-                        pg.draw.circle(main.surface, BLUE, pos, 25)
-                        draw_text(uname, get_font(18), BLACK, main.surface, pos[0], pos[1]-30, 'center')
+                        pg.draw.circle(main.surface, BLUE, adj_pos, 25)
+                        draw_text(uname, get_font(18), BLACK, main.surface, adj_pos[0], adj_pos[1]-30, 'center')
                     # Draw bullets received from server
                     for b in self.mphandler.get_bullets():
-                        adj_pos = self.adjust_pos((b.x, b.y))
-                        pg.draw.circle(main.surface, RED, (b.x, b.y), 5)
+                        adj_pos = self.adjust_pos((b[0], b[1]))
+                        pg.draw.circle(main.surface, RED, adj_pos, 5)
                     # Draw enemies received from server
                     for e in self.mphandler.get_enemies():
-                        adj_pos = self.adjust_pos((e.x, e.y))
-                        pg.draw.rect(main.surface, GREEN, (e.x-15, e.y-15, 30, 30))
+                        adj_pos = self.adjust_pos((e[0], e[1]))
+                        print(adj_pos)
+                        pg.draw.rect(main.surface, GREEN, (adj_pos[0]-15, adj_pos[1]-15, 30, 30))
                     # Draw own username above player sprite
                     draw_text(self.username, get_font(18), BLACK, main.surface, self.player_rect.centerx, self.player_rect.centery-30, 'center')
         return self.player_health > 0
     
     def adjust_pos(self, pos):
         return [
-            pos[0] + self.player_world_pos[0] - PLAYERPOS[0],
-            pos[1] + self.player_world_pos[1] - PLAYERPOS[1]
+            pos[0] + PLAYERPOS[0] - self.player_world_pos[0],
+            pos[1] + PLAYERPOS[1] - self.player_world_pos[1]
         ]
     
     def create_bullet_for_player(self, uname: str, shoot_data: dict) -> None:

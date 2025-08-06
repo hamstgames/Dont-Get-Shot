@@ -17,9 +17,8 @@ class Main:
         self.select_mode()
 
     def select_mode(self):
-        import tkinter as tk
-        from tkinter import simpledialog
-        root = tk.Tk(); root.withdraw()
+        from tkinter import Tk, simpledialog
+        root = Tk(); root.withdraw()
         mode = simpledialog.askstring("Mode", "Enter 'single', 'server', or 'client':")
         if mode == "server" or mode == "client":
             self.multiplayer = True
@@ -57,6 +56,7 @@ class Main:
             self.screen.blit(surface, (0, 0))
             pg.display.flip()
         if self.mphandler:
+            self.mphandler.remove_player(self.username)
             self.mphandler.stop()
         pg.quit()
 
