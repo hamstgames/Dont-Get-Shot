@@ -1,6 +1,6 @@
 import pygame as pg
 from constants import *
-from typing import Any, Iterable, Union
+from typing import Any
 
 class Wall(pg.sprite.Sprite):
     """A static wall object that blocks movement."""

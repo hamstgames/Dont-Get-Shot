@@ -66,9 +66,10 @@ class MultiplayerHandler:
                     # Client receives game state from server
                     if 'players' in msg:
                         with self.lock:
+                            # print(msg, self.bullets, self.enemies)
                             self.players = {uname: tuple(pos) for uname, pos in msg['players'].items()}
-                            self.bullets = [jsonable_to_rect(b) for b in msg.get('bullets', [])]
-                            self.enemies = [jsonable_to_rect(e) for e in msg.get('enemies', [])]
+                            self.bullets = msg.get('bullets', [])
+                            self.enemies = msg.get('enemies', [])
                     # Send own position to server
                     if self.players and self.username in self.players:
                         pos_msg = {
@@ -98,17 +99,16 @@ class MultiplayerHandler:
                 # Prepare game state
                 state = {
                     'players': self.players.copy(),
-                    'bullets': self.enemies.copy(),
+                    'bullets': self.bullets.copy(),
                     'enemies': self.enemies.copy()
                 }
                 data = json.dumps(state).encode()
+                # print(data)
                 
                 # NEW: Send to all connected clients
                 for addr in self.client_addresses.values():
-                    try:
-                        self.sock.sendto(data, addr)
-                    except:
-                        continue
+                    try: self.sock.sendto(data, addr)
+                    except: continue
             time.sleep(0.05)
 
     def add_player(self, username, pos):

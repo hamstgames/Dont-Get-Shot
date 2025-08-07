@@ -249,7 +249,6 @@ class Level:
                     # Draw enemies received from server
                     for e in self.mphandler.get_enemies():
                         adj_pos = self.adjust_pos((e[0], e[1]))
-                        print(adj_pos)
                         pg.draw.rect(main.surface, GREEN, (adj_pos[0]-15, adj_pos[1]-15, 30, 30))
                     # Draw own username above player sprite
                     draw_text(self.username, get_font(18), BLACK, main.surface, self.player_rect.centerx, self.player_rect.centery-30, 'center')

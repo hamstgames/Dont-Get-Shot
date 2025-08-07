@@ -30,7 +30,6 @@ class Main:
             is_server = (mode == "server")
             self.mphandler = MultiplayerHandler(self.username, is_server, ip)
             self.mphandler.add_player(self.username, PLAYERPOS)
-            print("aaa")
         else:
             self.multiplayer = False
             self.username = "Player"

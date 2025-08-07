@@ -45,7 +45,6 @@ WINH = info.current_h
 WINSIZE = (WINW, WINH)
 WINSW = WINW // 2; WINSH = WINH // 2
 WINSURFACE = (WINSW, WINSH)
-print(f"Window surface size: {WINSW}x{WINSH}")
 WINTIMES = WINW / WINSW
 
 FPS = 60
