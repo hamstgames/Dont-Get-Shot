@@ -41,7 +41,6 @@ def wpos_by_spos_all(target_pos_list: Iterable[pg.sprite.Sprite],
 info = pg.display.Info()
 WINW = info.current_w
 WINH = info.current_h
-# print(f"Window size: {WINW}x{WINH}")
 WINSIZE = (WINW, WINH)
 WINSW = WINW // 2; WINSH = WINH // 2
 WINSURFACE = (WINSW, WINSH)
@@ -80,7 +79,6 @@ for gun, data in GUNDATA.items():
     else:
         GUNDATA[gun]["image"] = scale1_2(IMAGES[data["image"]])
         GUNDATA[gun]["sound"] = SOUNDS[data["sound"]]
-# print(GUNDATA)
 
 get_blood = lambda: IMAGES[choice(["blood1","blood1", "blood2"])]
 def get_font(size: int) -> pg.font.Font:

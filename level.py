@@ -32,7 +32,7 @@ class Level:
                           'M(16)op Gun','Kriss SuperV','MP - 5','Grenade Launcher','UZI','B - 25',
                           'Big & Heavy','Double Barrel','Trash 5Run','Sniper Rifle','Golden Pistol']
         self.inventory_index = 0; self.gunmode = 0
-        if mphandler.is_server: # pyright: ignore[reportOptionalMemberAccess]
+        if multiplayer == False or mphandler.is_server: # pyright: ignore[reportOptionalMemberAccess]
             # only create enemies if this is the server
             Enemy([self.all_sprites, self.enemies], 150, 50, IMAGES['enemy'], 1)
         self.tick_timer = PulseTimer(1000 / TPS)
@@ -52,7 +52,7 @@ class Level:
         collisions = rect.collidelist(collist)
         return collisions == -1
 
-    def update(self, main: Any) -> bool:
+    def update(self, main: Any, dt) -> bool:
         """Update the game state or show inventory if open."""
         if self.inventory_open:
             self.handle_inventory_ui(main)
@@ -60,30 +60,29 @@ class Level:
             fps = main.clock.get_fps()
             self.fps_list.append(fps)
             if len(self.fps_list) > 10: self.fps_list.pop(0)
-            # try: fps = round(FPS / fps)
-            # except: fps = 0
+            dt = round(dt * 60 / 1000, 2)
             main.surface.fill(GRAY)
             keys = pg.key.get_pressed()
             self.movex, self.movey = 0, 0
             if keys[pg.K_a]:
-                self.player_rect.x -= PLAYERSPEED
-                if self.touched(): self.movex = PLAYERSPEED; self.flip = False
-                self.player_rect.x += PLAYERSPEED
+                self.player_rect.x -= PLAYERSPEED * dt
+                if self.touched(): self.movex = PLAYERSPEED * dt; self.flip = False
+                self.player_rect.x += PLAYERSPEED * dt
             if keys[pg.K_d]:
-                self.player_rect.x += PLAYERSPEED
-                if self.touched(): self.movex = -PLAYERSPEED; self.flip = True
-                self.player_rect.x -= PLAYERSPEED
+                self.player_rect.x += PLAYERSPEED * dt
+                if self.touched(): self.movex = -PLAYERSPEED * dt; self.flip = True
+                self.player_rect.x -= PLAYERSPEED * dt
             if keys[pg.K_w]:
-                self.player_rect.y -= PLAYERSPEED
-                if self.touched(): self.movey = PLAYERSPEED
-                self.player_rect.y += PLAYERSPEED
+                self.player_rect.y -= PLAYERSPEED * dt
+                if self.touched(): self.movey = PLAYERSPEED * dt
+                self.player_rect.y += PLAYERSPEED * dt
             if keys[pg.K_s]:
-                self.player_rect.y += PLAYERSPEED
-                if self.touched(): self.movey = -PLAYERSPEED
-                self.player_rect.y -= PLAYERSPEED
+                self.player_rect.y += PLAYERSPEED * dt
+                if self.touched(): self.movey = -PLAYERSPEED * dt
+                self.player_rect.y -= PLAYERSPEED * dt
             vector = pg.Vector2(self.movex, self.movey)
             if vector: vector.normalize_ip()
-            self.movex = vector.x * PLAYERSPEED; self.movey = vector.y * PLAYERSPEED
+            self.movex = vector.x * PLAYERSPEED * dt; self.movey = vector.y * PLAYERSPEED * dt
             self.player_rect.x += round(self.player_knockback.x)
             knockx = round(self.player_knockback.x)
             if self.touched(): self.movex  -= self.player_knockback.x
@@ -159,9 +158,9 @@ class Level:
             main.surface.blit(gun, rect)
             self.shoot_timer.duration = gundata['cooldown'] * 1000
             self.walls.update(self, main)
-            self.bullets.update(self)
+            self.bullets.update(self, dt)
             self.particles.update(self, main)
-            self.enemies.update(self, main)
+            self.enemies.update(self, main, dt)
             if self.tick_timer.update():
                 for enemy in self.enemies:
                     enemy.update_movement(self, main)
@@ -175,6 +174,8 @@ class Level:
                     BLACK, main.surface, 7, 7, 'left')
             draw_text(f'FPS: {round(sum(self.fps_list)/len(self.fps_list))}', 
                       get_font(17), BLACK, main.surface, 7, 25, 'left')
+            draw_text(f'dt: {dt}', get_font(17),
+                      BLACK, main.surface, 7, 43, 'left')
             pg.draw.rect(main.surface, BLACK, (8, 18, PLAYERHEALTH*5 + 4, 9))
             pg.draw.rect(main.surface, LIGHTRED, (10, 20, self.player_health*5, 5))
             draw_text(self.inventory[self.inventory_index], get_font(30), 
@@ -227,15 +228,6 @@ class Level:
                         pg.draw.rect(main.surface, GREEN, (adj_pos[0]-15, adj_pos[1]-15, 30, 30))
                 else:
                     # Client: update own player, send position and shoot requests
-                    # If shooting, send shoot request
-                    # if pg.mouse.get_pressed()[0] and self.shoot_timer.update():
-                    #     shoot_data = {
-                    #         'angle': angle,
-                    #         'rect': list(rect.center),
-                    #         'gun': self.inventory[self.inventory_index]
-                    #     }
-                    #     self.mphandler.send_shoot(self.username, shoot_data)
-                    #     self.shoot_timer.start_timer()
                     # Draw other players
                     for uname, pos in self.mphandler.get_players().items():
                         if uname == self.username or pos is None: continue

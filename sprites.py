@@ -23,7 +23,7 @@ class Explosion(pg.sprite.Sprite):
     """An expanding explosion effect that damages enemies."""
     def __init__(self, groups, x: int, y: int, radius: int, time: int, damage: float = 0, withlevel: bool = True, speed: int = 1) -> None:
         """Create an explosion at (x, y) with given radius and duration."""
-        super().__init__(groups) # print(radius)
+        super().__init__(groups)
         self.image = pg.Surface((radius*2, radius*2)).convert_alpha()
         self.image.fill((0,0,0,0))
         pg.draw.circle(self.image, YELLOW, (radius, radius), radius)
@@ -69,10 +69,10 @@ class Bullet(pg.sprite.Sprite):
         self.damage = damage
         self.killplayer = killplayer
 
-    def update(self, level: Any) -> None:
+    def update(self, level: Any, dt) -> None:
         """Move bullet and handle collisions."""
-        self.rect.x += round(self.direction[0] * self.speed)
-        self.rect.y += round(self.direction[1] * self.speed)
+        self.rect.x += round(self.direction[0] * self.speed) * dt
+        self.rect.y += round(self.direction[1] * self.speed) * dt
         self.rect.x += level.movex
         self.rect.y += level.movey
         if self.timer.update(): self.kill()
@@ -111,10 +111,10 @@ class PBullet(pg.sprite.Sprite):
         self.killplayer = killplayer
         self.last_damaged = None
 
-    def update(self, level: Any) -> None:
+    def update(self, level: Any, dt) -> None:
         """Move bullet and handle collisions, allowing penetration."""
-        self.rect.x += round(self.direction[0] * self.speed)
-        self.rect.y += round(self.direction[1] * self.speed)
+        self.rect.x += round(self.direction[0] * self.speed) * dt
+        self.rect.y += round(self.direction[1] * self.speed) * dt
         self.rect.x += level.movex
         self.rect.y += level.movey
         if self.timer.update(): self.kill()
@@ -243,13 +243,13 @@ class Enemy(pg.sprite.Sprite):
             self.direction = math.degrees(math.acos(vector[0] / long))
             if vector[1] < 0: self.direction = 360 - self.direction
             if self.shoot_timer.update():
-                pos = pg.Vector2(math.cos(math.radians(self.direction)), 
+                pos = pg.Vector2(math.cos(math.radians(self.direction)),
                                  math.sin(math.radians(self.direction)))
                 # make pos move twards to player so the enemy doesn't shoot himself
                 move = pg.Vector2(level.player_rect.center)-pg.Vector2(self.rect.center)
                 move = move.normalize()
-                x = round(self.rect.centerx + move.x * 20)
-                y = round(self.rect.centery + move.y * 20)
+                x = round(self.rect.centerx + move.x * 25)
+                y = round(self.rect.centery + move.y * 25)
                 Bullet([level.all_sprites, level.bullets], x, y, pos, self.direction, 10, 0)
                 self.shoot_timer.start_timer()
         if self.health <= 0:
@@ -260,16 +260,16 @@ class Enemy(pg.sprite.Sprite):
             self.image = self.right
         else: self.image = self.left
     
-    def update(self, level: Any, main: Any) -> None:
+    def update(self, level: Any, main: Any, dt) -> None:
         """Move enemy and handle collisions."""
         self.rect.x += level.movex
         self.rect.y += level.movey
-        self.rect.x += round(self.speed * math.cos(self.direction) * self.move)
+        self.rect.x += round(self.speed * math.cos(self.direction) * self.move) * dt
         if not level.touched(self.rect):
-            self.rect.x -= round(self.speed * math.cos(self.direction) * self.move)
-        self.rect.y += round(self.speed * math.sin(self.direction) * self.move)
+            self.rect.x -= round(self.speed * math.cos(self.direction) * self.move) * dt
+        self.rect.y += round(self.speed * math.sin(self.direction) * self.move) * dt
         if not level.touched(self.rect):
-            self.rect.y -= round(self.speed * math.sin(self.direction) * self.move)
+            self.rect.y -= round(self.speed * math.sin(self.direction) * self.move) * dt
         if level.debug:
             rect = self.rect.inflate(2, 2)
             pg.draw.rect(main.surface, RED, rect, 1)
@@ -292,12 +292,12 @@ class Grenade(pg.sprite.Sprite):
         self.damage = damage
         self.change_timer = PulseTimer(300)
 
-    def update(self, level: Any) -> None:
+    def update(self, level: Any, dt) -> None:
         """Move grenade and check for explosion triggers."""
         self.rect.x += level.movex
         self.rect.y += level.movey
-        self.rect.x += round(self.movex)
-        self.rect.y += round(self.movey)
+        self.rect.x += round(self.movex) * dt
+        self.rect.y += round(self.movey) * dt
         center = self.rect.center
         if self.change_timer.update():
             self.image = next(self.images)

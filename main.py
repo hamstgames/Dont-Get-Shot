@@ -22,11 +22,8 @@ class Main:
         mode = simpledialog.askstring("Mode", "Enter 'single', 'server', or 'client':")
         if mode == "server" or mode == "client":
             self.multiplayer = True
-            # self.username = simpledialog.askstring("Username", "Enter your username:")
-            # ip = simpledialog.askstring("IP", "Enter server IP (for server, use 0.0.0.0):")
-            if mode == "client": self.username = 'client'
-            else: self.username = 'server'
-            ip = '127.0.0.1'
+            self.username = simpledialog.askstring("Username", "Enter your username:")
+            ip = "127.0.0.1"
             is_server = (mode == "server")
             self.mphandler = MultiplayerHandler(self.username, is_server, ip)
             self.mphandler.add_player(self.username, PLAYERPOS)
@@ -41,7 +38,7 @@ class Main:
     def run_game(self) -> None:
         alive = True
         while self.running:
-            self.clock.tick(FPS)
+            dt = self.clock.tick(FPS)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.running = False
@@ -49,7 +46,7 @@ class Main:
                     if event.key == pg.K_ESCAPE:
                         self.running = False
                 pg.event.post(event)
-            if alive: alive = self.level.update(self)
+            if alive: alive = self.level.update(self, dt)
             else: self.level.game_over(self)
             surface = pg.transform.scale(self.surface, WINSIZE)
             self.screen.blit(surface, (0, 0))
