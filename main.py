@@ -3,7 +3,6 @@ from level import Level
 from constants import *
 from multiplayerhandler import MultiplayerHandler
 pg.init()
-pg.mixer.init()
 
 class Main:
     def __init__(self) -> None:
@@ -22,7 +21,8 @@ class Main:
         mode = simpledialog.askstring("Mode", "Enter 'single', 'server', or 'client':")
         if mode == "server" or mode == "client":
             self.multiplayer = True
-            self.username = simpledialog.askstring("Username", "Enter your username:")
+            self.username = simpledialog.askstring(
+                "Username", "Enter your username:") or 'unnamed'
             ip = "127.0.0.1"
             is_server = (mode == "server")
             self.mphandler = MultiplayerHandler(self.username, is_server, ip)
