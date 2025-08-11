@@ -8,5 +8,5 @@
     ],
     "python.testing.pytestEnabled": false,
     "python.testing.unittestEnabled": true,
-    "Codegeex.RepoIndex": true
+    "chat.math.enabled": true
 }
